@@ -1,0 +1,670 @@
+---
+title : SpringMVC配置
+categories : 
+- JavaWeb
+- SpringMVC
+date : 2018-8-10
+---
+
+# Spring MVC配置
+
+## 1.SpringMVC初始化配置
+
+### 1.1编写配置类
+
+**Java配置**
+
+```java
+@Configuration
+@EnableWebMvc // 导入DelegatingWebMvcConfiguration配置类
+@ComponentScan(basePackages ="com.hdr.webstore")
+public class WebAppConfig implements WebMvcConfigurer {
+	
+}
+```
+
+#### @EnableWebMvc  
+
+**使用该注解修饰Configuration类可从WebMvcConfigurationSupport导入Spring MVC配置**
+
+```java
+@Retention(value=RUNTIME)
+@Target(value=TYPE)
+@Documented
+@Import(value=DelegatingWebMvcConfiguration.class)
+public @interface EnableWebMvc
+
+```
+
+**如果想修改导入的配置，实现WebMvcConfigurer接口并覆盖单个方法**
+
+```java
+@Configuration
+@EnableWebMvc
+@ComponentScan(basePackageClasses = MyConfiguration.class)
+public class MyConfiguration implements WebMvcConfigurer {
+    @Override
+    public void addFormatters(FormatterRegistry formatterRegistry) {
+        formatterRegistry.addConverter(new MyConverter());
+    }
+
+    @Override
+    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+        converters.add(new MyHttpMessageConverter());
+    }
+}
+```
+
+注意：
+
+只有一个`@Configuration`类可以使用`@EnableWebMvc`注解修饰，不过`WebMvcConfigurer`可以被多个配置类实现
+
+#### DelegatingWebMvcConfiguration
+
+WebMvcConfigurationSupport的子类，通过检测和委派`WebMvcConfigurer`类型的Bean来修改WebMvcConfigurationSupport提供的配置。
+
+#### WebMvcConfigurationSupport
+
+这是MVC提供Java配置的主要类
+
+#### WebMvcConfigurer
+
+通过使用`@EnableWebMvc`修饰`@Configuration`类,从而引入了`DelegatingWebMvcConfiguration`配置类
+
+`DelegatingWebMvcConfiguration`继承了`WebMvcConfigurationSupport`
+
+如果要对继承的方法进行重写,那就要@EnableWebMvc修饰的@Configuration类继承WebMvcConfigurer接口,然后重写接口方法.
+
+**XML配置**
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+    <!--告诉Spring MVC 我们需要用到它提供的注解-->
+    <mvc:annotation-driven/>
+    <!--告诉Spring MVC 大概在哪里会找到使用了@Controller注解的Java类-->
+    <context:component-scan base-package="com.packt.webstore"/>
+</beans>
+```
+
+### 1.2注册DispathcerServlet
+
+**Java配置**
+
+```java
+public class WebAppInitializer 
+    extends AbstractAnnotationConfigDispatcherServletInitializer {
+    
+    @Override
+    protected Class<?>[] getRootConfigClasses() {
+        return null;
+    }
+
+    @Override
+    protected Class<?>[] getServletConfigClasses() {
+        return new Class[]{WebAppConfig.class};
+    }
+
+    @Override
+    protected String[] getServletMappings() {
+        return new String[]{"/"};
+    }
+}
+```
+
+#### SpringServletContainerInitializer
+
+SpringServletContainerInitializer通过使用WebApplicationInitializer这个SPI来提供基于代码的方式来配置servlet容器
+
+**工作原理**
+
+在容器启动阶段，如果在类路径发现了`spring-web`模块，那么容器会加载、实例化这个类，然后再调用它的`onStartup`方法。 
+
+#### WebApplicationInitializer
+
+`WebApplicationInitializer`是个SPI（Service Provider Interface 服务提供接口）目的是提供接口，让第三方（服务厂商或扩展框架开发者）提供自定义实现的服务功能。
+
+该接口的实现类提供以编程的方式配置ServletContext
+
+Servlet 3.0容器启动`SpringServletContainerInitializer`类，通过`SpringServletContainerInitializer`类检测`WebApplicationInitializer`接口的实现类，然后配置`ServletContext`
+
+WebApplicationInitializer接口的实现类
+
+- AbstractContextLoaderInitializer
+
+  在servlet context中注册`ContextLoaderListener`
+
+  子类只需要实现`createRootApplicationContext()`
+
+- AbstractDispatcherServletInitializer
+
+  在servlet context中注册`DispatcherServlet`，推荐使用下面那个实现类
+
+- AbstractAnnotationConfigDispatcherServletInitializer
+
+  注册`DispatcherServlet`以及使用基于Java的Spring配置
+
+  子类需要实现`getRootConfigClasses() `和`getServletConfigClasses()`
+
+**XML配置**
+
+```xml
+ <servlet>
+   <servlet-name>dispatcher</servlet-name>
+   <servlet-class>
+       org.springframework.web.servlet.DispatcherServlet
+   </servlet-class>
+   <init-param>
+     <param-name>contextConfigLocation</param-name>
+     <param-value>/WEB-INF/spring/dispatcher-config.xml</param-value>
+   </init-param>
+   <load-on-startup>1</load-on-startup>
+ </servlet>
+
+ <servlet-mapping>
+   <servlet-name>dispatcher</servlet-name>
+   <url-pattern>/</url-pattern>
+ </servlet-mapping>
+```
+
+## 2.模型
+
+据我目前的理解，SpringMVC有两种工作方式。
+
+一种是接收请求，然后直接把处理后的数据，返回给请求方，例如常见的返回json数据。
+
+另一种就是接收请求，然后把处理后的数据，交给视图使用，最后返回渲染好的页面给请求方。
+
+模型（Model）负责携带要被视图使用的数据。
+
+在SpirngMVC中有两个类与模型有关，一个是`ModelAndView`，一个是`Model`，
+
+前者不仅携带数据，还说明了数据交由哪个视图处理。后者仅携带数据。
+
+```java
+// 使用ModelAndView
+@GetMapping
+public ModelAndView Welcome(ModelAndView mv) {
+   mv.addObject("name", "hdr");
+   mv.setViewName("welcome");
+   return mv;
+}
+```
+
+```java
+// 使用Model
+@GetMapping
+public String Welcome(Model model) {
+   model.addAttribute("name","hdr");
+   return "welcome";
+}
+```
+
+## 3.视图解析器与视图
+
+视图解析器（view resolver）、视图（view）
+
+视图是渲染数据模型展示给用户的用户的组件，在SpringMVC中分了逻辑视图和非逻辑视图两种。
+
+逻辑视图需要是视图解析器进行进一步的定位，例如上面的例子，我们只是返回了一个字符串，就能找到对应的jsp文件，这是视图解析器起的作用。
+
+**工作流程**
+
+1. 请求来到dispatcher servlet，dispatcher servlet把请求发送给相应的Controller进行处理。
+2. Controller对Model中的对象进行更新，然后返回view的名称给Controller。
+3. Controller使用view resolver找出view的实际路径，然后把model传递给view。
+4. view使用Model提供的数据进行渲染，然后把页面传递给dispatcher servlet
+5. dispatcher servlet 把页面返回给用户。
+
+
+
+**具体原理还有待学习**
+
+### 3.1JSP
+
+```java
+@Bean
+public InternalResourceViewResolver getInternalResourceViewResolver(){
+    InternalResourceViewResolver resolver = new InternalResourceViewResolver();
+    resolver.setViewClass(JstlView.class);
+    resolver.setPrefix("/WEB-INF/jsp/");
+    resolver.setSuffix(".jsp");
+    return resolver;
+}
+```
+### 3.2ThymeLeaf
+
+由于Servlet默认提供了对JSP文件进行渲染的功能，所以使用JSP我们只需要注册JSP视图解析器即可。
+
+但是对于ThymeLeaf，我们不仅要注册视图解析器，还要注册模板引擎和模板解析器。
+
+```java
+@Autowired
+private ApplicationContext applicationContext;
+
+@Bean
+public SpringResourceTemplateResolver templateResolver(){
+   SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
+   templateResolver.setApplicationContext(this.applicationContext);
+   templateResolver.setPrefix("/WEB-INF/templates/");
+   templateResolver.setSuffix(".html");
+   templateResolver.setCharacterEncoding("utf-8");
+   templateResolver.setTemplateMode(TemplateMode.HTML);
+   templateResolver.setCacheable(true);
+   return templateResolver;
+}
+
+@Bean
+public SpringTemplateEngine templateEngine(){
+   SpringTemplateEngine templateEngine = new SpringTemplateEngine();
+   templateEngine.setTemplateResolver(templateResolver());
+   templateEngine.setEnableSpringELCompiler(true);
+   return templateEngine;
+}
+// 注册视图解析器
+@Bean
+public ThymeleafViewResolver viewResolver(){
+   ThymeleafViewResolver viewResolver = new ThymeleafViewResolver();
+   viewResolver.setTemplateEngine(templateEngine());
+   viewResolver.setCharacterEncoding("utf-8");
+   return viewResolver;
+}
+```
+
+### 3.3JSON
+
+**导入依赖**
+
+```xml
+<dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-databind</artifactId>
+    <version>2.9.6</version>
+</dependency>
+```
+
+**使用**
+
+```java
+// 返回Json数据
+@GetMapping
+@ResponseBody
+public User getUser(){
+   User user = new User();
+   user.setName("黄大仁");
+   user.setEmail("13143754797@163.com");
+   return user;
+}
+
+// 获取Json数据
+@PostMapping
+@ResponseBody
+public User getUser(@RequestBody User user){
+	return user;
+}
+```
+
+**JsonView 了解一下**
+
+## 4.过滤器与拦截器
+
+- filter
+- 拦截器
+
+### 4.1 过滤器
+
+
+
+
+
+### 4.1拦截器
+
+`HandlerInterceptor`接口负责拦截功能,它具有以下三个方法
+
+- preHandle: 在请求到达Controller之前调用
+- postHandle: Controller方法执行完毕后调用
+- afterCompletion:整个请求流程走完后再调用
+
+#### 4.1.1拦截器的设置
+
+所有的拦截器都要实现HandlerInterceptor接口，该接口具有三个方法
+
+```java
+default boolean preHandle(HttpServletRequest request, HttpServletResponse response, 
+                          Object handler)throws Exception {
+   return true;// 返回true则，则把请求交给处理器处理，否则结束所有流程
+}
+// 处理器处理后，视图处理前
+default void postHandle(HttpServletRequest request, HttpServletResponse response, 
+                        Object handler,@Nullable ModelAndView modelAndView) 
+    throws Exception {
+}
+// 视图处理后
+default void afterCompletion(HttpServletRequest request, HttpServletResponse response, 
+                             Object handler, @Nullable Exception ex) throws Exception {
+}
+```
+
+#### 4.1.2注册拦截器
+
+```java
+@Override
+public void addInterceptors(InterceptorRegistry registry) {
+   registry
+         .addInterceptor(new CheckLogin())
+         .addPathPatterns("/category");
+}
+```
+
+#### 4.1.3多个拦截器的顺序
+
+先注册的，先被执行
+
+## 5.文件上传
+
+### 5.1SpringMVC对文件上传的支持
+
+首先，DispatchServlet使用适配器模式，将HttpServletRequest接口对象转换成MultipartHttpServletRequest对象。
+
+MultipartHttpServletRequest接口扩展了HttpServletRequest接口，定义了一些操作文件的方法，我们通过这些方法实现对上传文件的操作。
+
+### 5.2MultipartResolver
+
+MultipartResolver接口用于把HttpServletRequest转换成MultipartHttpServletRequest。
+
+MultipartResolver接口具有两个实现类，分别是StandardServletMultipartResolver和CommonsMultipartResolver，Spring推荐使用前者，因为那是Servlet API提供的包。
+
+```java
+// 在配置类添加multipartResolver Bean
+@Bean
+public StandardServletMultipartResolver multipartResolver(){
+   return new StandardServletMultipartResolver();
+}
+```
+
+```java
+@Override
+protected Filter[] getServletFilters() {
+   CharacterEncodingFilter cef = new CharacterEncodingFilter();
+   cef.setEncoding("UTF-8");
+   cef.setForceEncoding(true);
+   return new Filter[]{new HiddenHttpMethodFilter(), cef};
+   // 注意：这个HiddenHttpMethodFilter是必须的
+}
+```
+
+```java
+@Controller
+@RequestMapping("/")
+public class UploadController {
+
+   @PostMapping
+   @ResponseBody
+   public void upload(@RequestParam(value = "file") Part file) throws IOException {
+      String path = "/home/hdr/Desktop/";
+      String fileName = "beauty.jpg";
+      file.write(path + fileName);
+   }
+}
+```
+
+
+
+## 6.静态资源的访问
+
+一般我们使用SpringMVC，都会把DispatcherServlet请求映射配置为”/”，那么Web容器会把所有请求都交给Spring MVC的DispatchServlet处理，那么就会有这么一个问题，在请求静态资源的时候，Spring MVC会将它们当成一个普通请求处理，因此找不到对应处理器将导致错误。如何在DispatcherServlet请求映射配置为”/”的情况下，让Spring框架能够捕获所有URL的请求，同时又将静态资源的请求转由Web容器处理呢？有两种方法
+
+### 默认Servlet
+
+启动DefaultServletHttpRequestHandler，设置默认Servlet的URL映射为/ **，并且相对于其他URL映射具有最低优先级，也就是把DispatchServlet处理不了的请求，转发给容器的默认Servlet处理。
+
+```java
+@Override
+public void configureDefaultServletHandling(
+    DefaultServletHandlerConfigurer configurer) {
+    configurer.enable();
+}
+// 层层匹配,真不知性能如何
+```
+
+对应XML配置
+
+```xml
+<mvc:default-servlet-handler/>
+```
+
+### 资源处理器
+
+```java
+// 在配置类重写该方法
+@Override
+public void addResourceHandlers(ResourceHandlerRegistry registry) {
+    registry
+        .addResourceHandler("/img_in_res/**")
+    	.addResourceLocations("classpath:/img_in_res/");
+    registry
+        .addResourceHandler("/img_in_web/**")
+    	.addResourceLocations("/img_in_web/");
+    registry
+        .addResourceHandler("/img_in_web_inf/**")
+    	.addResourceLocations("/WEB-INF/img_in_web_inf/");
+}
+```
+
+**注意**：理解项目打包后的结构关系非常重要。
+
+## 日期类型参数的处理
+
+一般返回时间戳
+
+
+
+## 异常处理
+
+**自定义页面**
+
+**根据请求方，返回相映的结果**
+
+
+
+## 数据绑定 data binding
+
+Sprng MVC提供了WebDataBinder类,用来从HttpServletRequest对象中提取相关的数据,然后组装到相应的对象中,并进行验证.
+
+我们可以在@Controller中使用@InitBinder注解配置数据绑定的行为.
+
+```java
+@InitBinder
+public void initialiseBinder(WebDataBinder binder) {
+    binder.setAllowedFields("productId","name","unitPrice","description",
+                            "manufacturer","category","unitsInStock",
+                            "condition");
+}
+```
+
+```java
+public String
+processAddNewProductForm(@ModelAttribute("newProduct")Product productToBeAdded, 
+                         BindingResult result){
+    // 添加 BindingResult
+    String[] suppressedFields = result.getSuppressedFields();
+    if (suppressedFields.length > 0) {
+    	throw new RuntimeException("Attempting to bind disallowed fields:"+                                   StringUtils.arrayToCommaDelimitedString(suppressedFields));
+    }
+    // 更多详情请查看@InitBinder 和 BindingResult
+}
+```
+
+## Bean Validation
+
+## 提取外部信息
+
+```java
+@Bean
+public MessageSource messageSource() {
+    ResourceBundleMessageSource resource = new ResourceBundleMessageSource();
+    resource.setBasename("messages");
+    return resource;
+}
+```
+
+
+
+## multipart request
+
+```java
+@Bean
+public CommonsMultipartResolver multipartResolver() {
+    CommonsMultipartResolver resolver=new CommonsMultipartResolver();
+    resolver.setDefaultEncoding("utf-8");
+    resolver.setMaxUploadSize(10240000);
+    return resolver;
+}
+```
+
+依赖
+
+```java
+commons-fileupload
+commons-io
+```
+
+```java
+public String processAddNewProductForm(
+    @ModelAttribute("newProduct") Product newProduct,
+    BindingResult result, HttpServletRequest request) {
+    
+    MultipartFile productImage = newProduct.getProductImage();
+    
+    String rootDirectory = request.getSession().getServletContext().getRealPath("/");
+    if (productImage!=null && !productImage.isEmpty()) {
+    	try {
+    		productImage.transferTo(new File(
+                rootDirectory + "resources\\images" + newProduct.getProductId() + ".png")
+                                   );
+    	} catch (Exception e) {
+    		throw new RuntimeException("Product Image saving failed", e);
+    }
+}
+```
+
+## ContentNegotiatingViewResolver
+
+ContentNegotiating(内容协商),提供了一种机制,可以采用不同的表现形式来表现同一种资源.
+
+表现形式例如JSP JSON XML.
+
+**依赖**
+
+```
+spring-oxm
+acksonmapper-asl
+jackson-databind
+```
+
+**注册Bean**
+
+```java
+@Bean
+public MappingJackson2JsonView jsonView() {
+    MappingJackson2JsonView jsonView = new MappingJackson2JsonView();
+    jsonView.setPrettyPrint(true);
+    return jsonView;
+}
+
+@Bean
+public MarshallingView xmlView() {
+    Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
+    marshaller.setClassesToBeBound(Product.class);
+    MarshallingView xmlView = new MarshallingView(marshaller);
+    return xmlView;
+}
+
+@Bean
+public ViewResolver contentNegotiatingViewResolver(ContentNegotiationManager manager) {
+    ContentNegotiatingViewResolver resolver = new ContentNegotiatingViewResolver();
+    resolver.setContentNegotiationManager(manager);
+    ArrayList<View> views = new ArrayList<>();
+    views.add(jsonView());
+    views.add(xmlView());
+    resolver.setDefaultViews(views);
+    return resolver;
+}
+```
+
+## HandlerExceptionResolver
+
+HandlerExceptionResolver接口的实现类可以解析控制器映射和执行过程中抛出的异常.
+
+Spring MVC 为了我们提供了HandlerExceptionResolver接口的两个实现类,
+
+- `ResponseStatusExceptionResolver` 
+- `ExceptionHandlerExceptionResolver`
+
+```java
+@ResponseStatus(value=HttpStatus.NOT_FOUND, 
+                reason="No products found under this category")
+public class NoProductsFoundUnderCategoryException extends RuntimeException{
+	private static final long serialVersionUID = 3935230281455340039L;
+}
+```
+
+---
+
+```java
+public class ProductNotFoundException extends RuntimeException{
+    private static final long serialVersionUID = -694354952032299587L;
+    private String productId;
+    
+    public ProductNotFoundException(String productId) {
+    	this.productId = productId;
+	}
+    
+	public String getProductId() {
+        return productId;
+    }
+}
+```
+
+在@controller类添加
+
+```java
+@ExceptionHandler(ProductNotFoundException.class)
+public ModelAndView handleError(HttpServletRequest req,
+                                ProductNotFoundException exception) {
+    ModelAndView mav = new ModelAndView();
+    mav.addObject("invalidProductId",exception.getProductId());
+    mav.addObject("exception", exception);
+    mav.addObject("url",req.getRequestURL()+"?"+req.getQueryString());
+    mav.setViewName("productNotFound");
+    return mav;
+}
+```
+
+
+
+## 国际化
+
+```java
+@Bean
+public LocaleResolver localeResolver(){
+    SessionLocaleResolver resolver = new SessionLocaleResolver();
+    resolver.setDefaultLocale(new Locale("en"));
+    return resolver;
+}
+```
+
+```java
+@Override
+public void addInterceptors(InterceptorRegistry registry) {
+    LocaleChangeInterceptor localeChangeInterceptor = new LocaleChangeInterceptor();
+    localeChangeInterceptor.setParamName("language");
+    registry.addInterceptor(localeChangeInterceptor);
+}
+```
+
+## 
+
