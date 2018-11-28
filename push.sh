@@ -1,3 +1,4 @@
 git add source/
-git commit -m "update source"
+git add push.sh
+git commit -m "$1"
 git push origin master
