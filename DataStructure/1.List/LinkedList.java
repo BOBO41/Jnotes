@@ -93,7 +93,7 @@ public class LinkedList<E> {
     // 在链表中不是一个常用的操作，练习用：）
     public void set(int index, E e){
         if(index < 0 || index >= size)
-            throw new IllegalArgumentException("Set failed. Illegal index.");
+            throw new IllegalArgumentException("Update failed. Illegal index.");
 
         Node cur = dummyHead.next;
         for(int i = 0 ; i < index ; i ++)
@@ -117,6 +117,8 @@ public class LinkedList<E> {
     public E remove(int index){
         if(index < 0 || index >= size)
             throw new IllegalArgumentException("Remove failed. Index is illegal.");
+
+        // E ret = findNode(index).e; // 两次遍历
 
         Node prev = dummyHead;
         for(int i = 0 ; i < index ; i ++)
