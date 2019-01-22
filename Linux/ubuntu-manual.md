@@ -24,11 +24,11 @@ sudo apt install shadowsocks
 #编写配置文件
 cat > /home/hdr/App/Tools/SSR/config.json <<EOL
 {
-"server":"67.216.216.164",
-"server_port":444,
+"server":"xxxxx",
+"server_port":xx,
 "local_address": "127.0.0.1",
 "local_port":1080,
-"password":"NTQyOTdmOT",
+"password":"xx",
 "timeout":300,
 "method":"aes-256-cfb",
 "fast_open": false,
