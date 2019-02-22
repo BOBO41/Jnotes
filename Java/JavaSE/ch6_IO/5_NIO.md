@@ -2,7 +2,7 @@
 title : 5.NIO
 categories : 
 - JavaSE
-- ch4IO
+- ch6IO
 date : 2018-5-18
 ---
 

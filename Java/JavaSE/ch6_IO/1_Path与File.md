@@ -2,7 +2,7 @@
 title : 1.Path与File
 categories : 
 - JavaSE
-- ch4IO
+- ch6IO
 date : 2018-5-15
 ---
 

@@ -2,7 +2,7 @@
 title : 0.IO概述
 categories : 
 - JavaSE
-- ch4IO
+- ch6IO
 date : 2018-5-15
 ---
 

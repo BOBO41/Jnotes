@@ -2,7 +2,7 @@
 title : 4.RandomAccessFile
 categories : 
 - JavaSE
-- ch4IO
+- ch6IO
 date : 2018-5-16
 ---
 

@@ -170,5 +170,33 @@ $("p").css("color","read");
 $("p").css({"font-size":"30px","background-color":"#888888"});
 ```
 
-## 3.Jquery中的时间和动画
+## 3.Jquery中的事件
+
+```javascript
+$(document).ready() # 等DOM加载完毕
+window.onload # 等待页面所有元素加载完毕
+$("img").load(function()){} # 等图片加载完毕后执行函数
+# bind(type,[,data],fn);
+$("p").bind("click",function(){
+  consolo.log("hello");
+});
+```
+
+**事件冒泡**
+
+```javascript
+$("span").bind("click",function(event){
+  // 传递事件对象
+  
+  event.stopPropagtion(); # 阻止事件冒泡
+  event.preventDefault(); # 阻止默认行为
+});
+```
+
+## 4.jQuery中的动画
+
+```javascript
+show() hide() # display 
+fadeIn() fadeOut()
+```
 
