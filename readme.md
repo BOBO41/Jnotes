@@ -1,10 +1,8 @@
-<div align="center">
-
 |           数据结构与算法           |  操作系统  | 计算机网络 |   Java   |    数据库     | 系统设计 |   工具   |
 | :--------------------------------: | :--------: | :--------: | :------: | :-----------: | :------: | :------: |
-| [:rocket:](#rocket-数据结构与算法) | :computer: |  :cloud:   | :coffee: | :floppy_disk: |  :bulb:  | :hammer: |
+| [:rocket:](#rocket-数据结构与算法) | [:computer:](#computer-操作系统) |  [:cloud:](#cloud-计算机网络)   | [:coffee:](#coffee-Java) | [:floppy_disk:](#floppy_disk-数据库) |  [:bulb:](#bulb-系统设计)  | [:hammer:](#hammer-工具) |
 
-</div>
+
 
 ## :rocket: ​数据结构与算法
 
