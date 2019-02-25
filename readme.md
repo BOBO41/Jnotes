@@ -15,7 +15,7 @@
 - [计算机操作系统](https://github.com/CyC2018/CS-Notes/blob/master/docs/notes/计算机操作系统.md)  [(转自CS-Notes)](https://github.com/CyC2018/CS-Notes)
 - [Linux](https://github.com/CyC2018/CS-Notes/blob/master/docs/notes/Linux.md)  [(转自CS-Notes)](https://github.com/CyC2018/CS-Notes)
 
-## :cloud: 网络 
+## :cloud: 计算机网络 
 
 ## :coffee: Java
 
