@@ -2,11 +2,11 @@
 | :------------------------------------: | :----------------------: | :----------------------------------------------------: | :----------------------------------: | :--------------------------: |
 | [:sun_with_face:](#sun_with_face-简介) | [:scroll:](#scroll-配置) | [:globe_with_meridians:](#globe_with_meridians-映射器) | [:microscope:](#microscope-运行原理) | [:surfer:](#​surfer-实用场景) |
 
-# :sun_with_face:简介
+## :sun_with_face:简介
 
 [返回头部](#sun_with_face-简介)
 
-# :scroll:配置
+## :scroll:配置
 
 MyBatis的配置文件对整个MyBatis系统具有深远的影响,接下来我们详细了解MyBatis的配置.
 
@@ -471,7 +471,7 @@ Mappers元素是用来对Mapper XML文件进行定位的。
 
 [返回头部](#sun_with_face-简介)
 
-# :globe_with_meridians:映射器
+## :globe_with_meridians:映射器
 
 ## 3.1映射器的主要元素
 
