@@ -1,5 +1,0 @@
-剩余
-    1.MyBatis原理
-    2.MyBatis-Spring原理
-    3.MyBatis实战
-    4.MyBatis插件
