@@ -35,7 +35,7 @@
 -   [数据库系统原理](https://github.com/CyC2018/CS-Notes/blob/master/docs/notes/数据库系统原理.md)[(转自CS-Notes)](https://github.com/CyC2018/CS-Notes)
 -   [SQL](https://github.com/CyC2018/CS-Notes/blob/master/docs/notes/SQL.md)[(转自CS-Notes)](https://github.com/CyC2018/CS-Notes)
 -   [Leetcode-Database 题解](https://github.com/CyC2018/CS-Notes/blob/master/docs/notes/Leetcode-Database%20题解.md)[(转自CS-Notes)](https://github.com/CyC2018/CS-Notes)
--   [MySQL](https://github.com/CyC2018/CS-Notes/blob/master/docs/notes/MySQL.md)[(转自CS-Notes)](https://github.com/CyC2018/CS-Notes)
+-   [MySQL](./数据库/MySQL/readme.md)
 -   [Redis](https://github.com/CyC2018/CS-Notes/blob/master/docs/notes/Redis.md)[(转自CS-Notes)](https://github.com/CyC2018/CS-Notes)
 
 ## :bulb: 系统设计 
