@@ -1,6 +1,6 @@
-|           简介           |       配置        |                         映射器                         |               运行原理               |           实用场景           |
-| :----------------------: | :---------------: | :----------------------------------------------------: | :----------------------------------: | :--------------------------: |
-| [:sun_with_face:](#简介) | [:scroll:](#配置) | [:globe_with_meridians:](#globe_with_meridians-映射器) | [:microscope:](#microscope-运行原理) | [:surfer:](#​surfer-实用场景) |
+|           简介           |       配置        |              映射器               |         运行原理          |       实用场景        |
+| :----------------------: | :---------------: | :-------------------------------: | :-----------------------: | :-------------------: |
+| [:sun_with_face:](#简介) | [:scroll:](#配置) | [:globe_with_meridians:](#映射器) | [:microscope:](#运行原理) | [:surfer:](#实用场景) |
 
 # 简介
 
@@ -471,9 +471,9 @@ Mappers元素是用来对Mapper XML文件进行定位的。
 
 [返回头部](#简介)
 
-## :globe_with_meridians:映射器
+# 映射器
 
-## 3.1映射器的主要元素
+## 映射器的主要元素
 
 -   select
 -   insert
@@ -484,9 +484,9 @@ Mappers元素是用来对Mapper XML文件进行定位的。
 -   cache
 -   cache-ref
 
-## 3.2CRUD
+## CRUD
 
-### 1.Select元素
+### Select元素
 
 #### Select元素的属性
 
@@ -521,9 +521,9 @@ List<Role> findRoleByAnnotation(@Param("roleName")String roleName,
 
 当参数个数一多，写起来也是难受
 
-#### 使用JavaBean传递参数
+#### 使用POJO传递参数
 
-### 2.insert元素
+### insert元素
 
 #### insert元素的属性
 
@@ -540,7 +540,7 @@ List<Role> findRoleByAnnotation(@Param("roleName")String roleName,
 | databaseI        |      |      |
 | lang             |      |      |
 
-## 3.sql元素
+## sql元素
 
 通过sql元素，我们可以写sql语句，然后在其他地方使用。
 
@@ -556,7 +556,7 @@ List<Role> findRoleByAnnotation(@Param("roleName")String roleName,
 
 
 
-## 4.ResultType
+## ResultType
 
 ResultType不是元素,它只是select元素中的一个属性.
 
@@ -605,7 +605,7 @@ public interface UserRepository {
 
 ------
 
-## 5.Result Maps元素
+## Result Maps元素
 
 ResultMaps其实就是ResultType的升级版,都是用来把select语句返回的结果映射到JavaBean的属性上。
 
@@ -899,7 +899,7 @@ public class Tutor
 
 ------
 
-## 6.缓存
+## 缓存
 
 **一级缓存**
 
@@ -938,7 +938,7 @@ MyBatis支持缓存功能，在默认情况下，它只开启一级缓存。（�
 
 这里定义了一个 FIFO,并每隔 60 秒刷新,存数结果对象或列表的 512 个引用,而且返回的对象被认为是只读的缓存配置。
 
-## 7.动态SQL
+## 动态SQL
 
 MyBatis的动态SQL包括以下几种元素
 
@@ -949,7 +949,7 @@ MyBatis的动态SQL包括以下几种元素
 | trim（where、set）        | 辅助元素                    | 用于处理一些SQL拼接问题 |
 | foreach                   | 循环语句                    |                         |
 
-### 7.1if
+### if
 
 ```xml
 <select id="searchCourses" parameterType="hashmap" resultMap="CourseResult">
@@ -979,7 +979,7 @@ MyBatis的动态SQL包括以下几种元素
 -->
 ```
 
-### 7.2choose  when  otherwise 
+### choose  when  otherwise 
 
 ```xml
 <select id="searchCourses" parameterType="hashmap" resultMap="CourseResult">
@@ -993,7 +993,7 @@ MyBatis的动态SQL包括以下几种元素
 <!--类似与switch语句-->
 ```
 
-### 7.3where元素
+### where元素
 
 ```xml
 <select id="searchCourses" parameterType="hashmap" resultMap="CourseResult">
@@ -1015,7 +1015,7 @@ MyBatis的动态SQL包括以下几种元素
 </select>
 ```
 
-### 7.4trim元素
+### trim元素
 
 trim元素类似于where元素,它更加灵活.
 
@@ -1037,7 +1037,7 @@ trim元素类似于where元素,它更加灵活.
 </select>
 ```
 
-### 7.5set元素
+### set元素
 
 ```xml
 <update id="updateStudent" parameterType="Student">
@@ -1051,7 +1051,7 @@ trim元素类似于where元素,它更加灵活.
 </update>
 ```
 
-### 7.6foreach元素
+### foreach元素
 
 ```xml
 <select id="searchCoursesByTutors" parameterType="map" resultMap="CourseResult">
@@ -1068,10 +1068,384 @@ trim元素类似于where元素,它更加灵活.
 
 [返回头部](#简介)
 
-# :microscope:运行原理
+# 运行原理
 
+MyBatis的运行分为两大部分。第一部分是读取配置文件，根据配置文件内容生成Configuration对象，通过该对象创建SqlSessionFactory。第二部分是SqlSession的执行过程。
 
+## SqlSessionFactory的构建
+
+SqlSessionFactory的构建分为两步：
+第一步，通过`org.apache.ibatis.builder.xml.XMLConfigBuilder`解析XML配置文件，根据配置文件内容生成`org.apache.ibatis.session.Configuration`对象。
+第二步，通过`SqlSessionFactoryBuilder`使用`Configuration`对象创建`SqlSessionFactory`。
+
+## SqlSession运行过程
+
+### 映射器的内部组成
+
+一般而言，一个映射器由3个部分组成。
+
+-   `MappedStatement`，它保存映射器的一个节点（select|insert|delete|update）。
+-   `SqlSource`，`MappedStatement`的一个属性，用于提供`BoundSql`对象。
+-   `BoundSql`，建立SQL和参数的地方，它有3个常用属性：sql、parameterObject、parameterMappings。
+    -   sql属性就是我们写的sql
+    -   如果传递的参数是POJO或者Map那么parameterObject就是参数本身，如果传递多个参数且没有使用`@Param`，那么就会将这些参数转变成一个Map<String,Object>对象，类似于`{"1":p1,"2":p2}`
+
+### 映射器的动态代理
+
+Mapper映射是通过动态代理来实现的，我们来看看其源码
+
+```java
+public class MapperProxyFactory<T> {
+
+  private final Class<T> mapperInterface;
+  private final Map<Method, MapperMethod> methodCache = 
+    new ConcurrentHashMap<Method, MapperMethod>();
+  // 构造器
+  public MapperProxyFactory(Class<T> mapperInterface) {
+    this.mapperInterface = mapperInterface;
+  }
+  // getter
+  public Class<T> getMapperInterface() {
+    return mapperInterface;
+  }
+  // getter
+  public Map<Method, MapperMethod> getMethodCache() {
+    return methodCache;
+  }
+  // 根据SqlSession生成MapperProxy，然后调用newInstance(MapperProxy<T> mapperProxy)
+  public T newInstance(SqlSession sqlSession) {
+    final MapperProxy<T> mapperProxy = new MapperProxy<T>(sqlSession, mapperInterface, methodCache);
+    return newInstance(mapperProxy);
+  }
+  // 使用JDK动态代理生成代理对象
+  @SuppressWarnings("unchecked")
+  protected T newInstance(MapperProxy<T> mapperProxy) {
+    return (T) Proxy.newProxyInstance(mapperInterface.getClassLoader(), new Class[] { mapperInterface }, mapperProxy);
+  }
+
+}
+```
+
+接下来看看`MapperProxy`的源码
+
+```java
+public class MapperProxy<T> implements InvocationHandler, Serializable {
+
+  private static final long serialVersionUID = -6424540398559729838L;
+  private final SqlSession sqlSession;
+  private final Class<T> mapperInterface;
+  private final Map<Method, MapperMethod> methodCache;
+  // 构造器
+  public MapperProxy(SqlSession sqlSession, Class<T> mapperInterface, Map<Method, MapperMethod> methodCache) {
+    this.sqlSession = sqlSession;
+    this.mapperInterface = mapperInterface;
+    this.methodCache = methodCache;
+  }
+
+  @Override
+  public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    try {
+      if (Object.class.equals(method.getDeclaringClass())) {
+        return method.invoke(this, args);
+      } else if (isDefaultMethod(method)) {
+        return invokeDefaultMethod(proxy, method, args);
+      }
+    } catch (Throwable t) {
+      throw ExceptionUtil.unwrapThrowable(t);
+    }
+    // 由于MapperProxyFactory.newInstance传递一个接口过来，所以之前没有返回
+    // 获取MapperMethod
+    final MapperMethod mapperMethod = cachedMapperMethod(method);
+    // 查看mapperMethod.execute方法源码就能发现它通过使用sqlSession实现存取功能
+    // SqlSession是后面的重点
+    return mapperMethod.execute(sqlSession, args);
+  }
+  private MapperMethod cachedMapperMethod(Method method) {
+    MapperMethod mapperMethod = methodCache.get(method);
+    if (mapperMethod == null) {
+      mapperMethod = new MapperMethod(mapperInterface, method,
+                                      sqlSession.getConfiguration());
+      methodCache.put(method, mapperMethod);
+    }
+    return mapperMethod;
+  }
+
+  @UsesJava7
+  private Object invokeDefaultMethod(Object proxy, Method method, Object[] args)
+      throws Throwable {
+    final Constructor<MethodHandles.Lookup> constructor = MethodHandles.Lookup.class
+        .getDeclaredConstructor(Class.class, int.class);
+    if (!constructor.isAccessible()) {
+      constructor.setAccessible(true);
+    }
+    final Class<?> declaringClass = method.getDeclaringClass();
+    return constructor
+        .newInstance(declaringClass,
+            MethodHandles.Lookup.PRIVATE | MethodHandles.Lookup.PROTECTED
+                | MethodHandles.Lookup.PACKAGE | MethodHandles.Lookup.PUBLIC)
+        .unreflectSpecial(method, declaringClass).bindTo(proxy).invokeWithArguments(args);
+  }
+
+  /**
+   * Backport of java.lang.reflect.Method#isDefault()
+   */
+  private boolean isDefaultMethod(Method method) {
+    return (method.getModifiers()
+        & (Modifier.ABSTRACT | Modifier.PUBLIC | Modifier.STATIC)) == Modifier.PUBLIC
+        && method.getDeclaringClass().isInterface();
+  }
+}
+```
+
+### SqlSession下的四大对象
+
+前面说到，MyBatis是通过SqlSession对象实现数据存取。这个过程通过`Executor`、`StatementHandler`、`ParameterHandler`、`ResultHandler`来实现。
+
+-   Executor：调度StatementHandler、ParameterHandler、ResultHandler来完成SQL的执行
+-   StatementHandler
+-   ParameterHandler：参数处理
+-   ResultHandler：处理结果
+
+```java
+// org.apache.ibatis.session.defaults.DefaultSqlSession
+@Override
+public <E> List<E> selectList(String statement, Object parameter, RowBounds rowBounds) {
+  try {
+    MappedStatement ms = configuration.getMappedStatement(statement);
+    // executor执行数据库操作
+    return executor.query(ms, wrapCollection(parameter), rowBounds, Executor.NO_RESULT_HANDLER);
+  } catch (Exception e) {
+    throw ExceptionFactory.wrapException("Error querying database.  Cause: " + e, e);
+  } finally {
+    ErrorContext.instance().reset();
+  }
+}
+```
+
+#### Executor
+
+MyBatis中有三种Executor，分别是`Simple`、`Reuse`、`Batch`。根据我们的配置来生成。
+
+```java
+// org.apache.ibatis.session.Configuration
+public Executor newExecutor(Transaction transaction, ExecutorType executorType) {
+  executorType = executorType == null ? defaultExecutorType : executorType;
+  executorType = executorType == null ? ExecutorType.SIMPLE : executorType;
+  Executor executor;
+  if (ExecutorType.BATCH == executorType) {
+    executor = new BatchExecutor(this, transaction);
+  } else if (ExecutorType.REUSE == executorType) {
+    executor = new ReuseExecutor(this, transaction);
+  } else {
+    executor = new SimpleExecutor(this, transaction);
+  }
+  if (cacheEnabled) {
+    executor = new CachingExecutor(executor);
+  }
+  // MyBatis插件的工作原理，在这里构建一层层的动态代理对象。
+  executor = (Executor) interceptorChain.pluginAll(executor);
+  return executor;
+}
+```
+
+继续看Executor
+
+```java
+// org.apache.ibatis.executor.SimpleExecutor
+@Override
+public <E> List<E> doQuery(MappedStatement ms, Object parameter, RowBounds rowBounds, 
+                           ResultHandler resultHandler, 
+                           BoundSql boundSql) throws SQLException {
+  Statement stmt = null;
+  try {
+    Configuration configuration = ms.getConfiguration();
+    // 第二个主人公StatementHandler
+    StatementHandler handler = 
+      configuration.newStatementHandler(wrapper, ms, parameter, 
+                                        rowBounds, resultHandler, boundSql);
+    stmt = prepareStatement(handler, ms.getStatementLog());
+    return handler.<E>query(stmt, resultHandler);
+  } finally {
+    closeStatement(stmt);
+  }
+}
+
+private Statement prepareStatement(StatementHandler handler, 
+                                   Log statementLog) throws SQLException {
+    Statement stmt;
+    Connection connection = getConnection(statementLog);
+    stmt = handler.prepare(connection, transaction.getTimeout());
+    handler.parameterize(stmt);
+    return stmt;
+  }
+```
+
+#### StatementHandler
+
+```java
+// org.apache.ibatis.session.Configuration
+public StatementHandler newStatementHandler(Executor executor, 
+                                            MappedStatement mappedStatement, 
+                                            Object parameterObject, RowBounds rowBounds,
+                                            ResultHandler resultHandler, 
+                                            BoundSql boundSql) {
+  // 适配器模式，真正的StatementHandler分为 SimpleStatementHandler、 CallableStatementHandler
+  // PreparedStatementHandler
+  StatementHandler statementHandler = 
+    new RoutingStatementHandler(executor, mappedStatement, parameterObject, 
+                                rowBounds, resultHandler, boundSql);
+  statementHandler = (StatementHandler) interceptorChain.pluginAll(statementHandler);
+  return statementHandler;
+}
+```
+
+```java
+// RoutingStatementHandler
+private final StatementHandler delegate;
+
+public RoutingStatementHandler(Executor executor, MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) {
+  // 根据Statement类型生成对应的StatementHandler
+  switch (ms.getStatementType()) {
+    case STATEMENT:
+      delegate = new SimpleStatementHandler(executor, ms, parameter, 
+                                            rowBounds, resultHandler, boundSql);
+      break;
+    case PREPARED:
+      delegate = new PreparedStatementHandler(executor, ms, parameter, 
+                                              rowBounds, resultHandler, boundSql);
+      break;
+    case CALLABLE:
+      delegate = new CallableStatementHandler(executor, ms, parameter, 
+                                              rowBounds, resultHandler, boundSql);
+      break;
+    default:
+      throw new ExecutorException("Unknown statement type: " + ms.getStatementType());
+  }
+
+}
+```
+
+现在我们以常用的`PreparedStatementHandler`为例，看看MyBatis是怎么执行查询的。
+
+```java
+public abstract class BaseStatementHandler implements StatementHandler {
+  // .....
+  // 为什么看这个方法？在上面的SimpleExecutor的prepareStatement方法调用了这个方法
+  @Override
+  public Statement prepare(Connection connection, 
+                           Integer transactionTimeout) throws SQLException {
+    ErrorContext.instance().sql(boundSql.getSql());
+    Statement statement = null;
+    try {
+      // 对SQL进行预编译
+      statement = instantiateStatement(connection);
+      setStatementTimeout(statement, transactionTimeout);
+      setFetchSize(statement);
+      return statement;
+    } catch (SQLException e) {
+      closeStatement(statement);
+      throw e;
+    } catch (Exception e) {
+      closeStatement(statement);
+      throw new ExecutorException("Error preparing statement.  Cause: " + e, e);
+    }
+  }
+  // 为什么看这个方法？在上面的SimpleExecutor的prepareStatement方法调用了这个方法
+  @Override
+  public void parameterize(Statement statement) throws SQLException {
+    // 第三个主人公PreparedStatement，后面再讲这个，先专注PreparedStatementHandler
+    parameterHandler.setParameters((PreparedStatement) statement);
+  }
+  
+}
+```
+
+```java
+// PreparedStatementHandler
+@Override
+public <E> List<E> query(Statement statement, ResultHandler resultHandler) throws SQLException {
+  // 经过之前的设置，这里的PreparedStatement已经可以直接使用
+  PreparedStatement ps = (PreparedStatement) statement;
+  ps.execute();
+  return resultSetHandler.<E> handleResultSets(ps);
+}
+```
+
+这里简单的把整个流程总结一下，Executor调用StatementHandler的prepare方法预编译SQL语句。然后用parameterize方法启动ParameterHandler设置参数，完成预编译，然后就是执行数据库操作，最后用ResultSetHandler封装结果返回给调用者。
+
+#### ParameterHandler
+
+对于预编译语句进行参数化处理
+
+```java
+public interface ParameterHandler {
+  Object getParameterObject();
+  void setParameters(PreparedStatement ps)
+      throws SQLException;
+}
+```
+
+```java
+// org.apache.ibatis.scripting.defaults.DefaultParameterHandler
+@Override
+public void setParameters(PreparedStatement ps) {
+  ErrorContext.instance().activity("setting parameters")
+    .object(mappedStatement.getParameterMap().getId());
+  List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
+  if (parameterMappings != null) {
+    for (int i = 0; i < parameterMappings.size(); i++) {
+      ParameterMapping parameterMapping = parameterMappings.get(i);
+      if (parameterMapping.getMode() != ParameterMode.OUT) {
+        Object value;
+        String propertyName = parameterMapping.getProperty();
+        if (boundSql.hasAdditionalParameter(propertyName)) { // issue #448 ask first for additional params
+          value = boundSql.getAdditionalParameter(propertyName);
+        } else if (parameterObject == null) {
+          value = null;
+        } else if (typeHandlerRegistry.hasTypeHandler(parameterObject.getClass())) {
+          value = parameterObject;
+        } else {
+          MetaObject metaObject = configuration.newMetaObject(parameterObject);
+          value = metaObject.getValue(propertyName);
+        }
+        
+        TypeHandler typeHandler = parameterMapping.getTypeHandler();
+        JdbcType jdbcType = parameterMapping.getJdbcType();
+        if (value == null && jdbcType == null) {
+          jdbcType = configuration.getJdbcTypeForNull();
+        }
+        try {
+          typeHandler.setParameter(ps, i + 1, value, jdbcType);
+        } catch (TypeException e) {
+          throw new TypeException("Could not set parameters for mapping: " + 
+                                  parameterMapping + ". Cause: " + e, e);
+        } catch (SQLException e) {
+          throw new TypeException("Could not set parameters for mapping: " + 
+                                  parameterMapping + ". Cause: " + e, e);
+        }
+      }
+    }
+  }
+}
+```
+
+#### ResultSetHandler
+
+```java
+public interface ResultSetHandler {
+  <E> List<E> handleResultSets(Statement stmt) throws SQLException;
+  <E> Cursor<E> handleCursorResultSets(Statement stmt) throws SQLException;
+  void handleOutputParameters(CallableStatement cs) throws SQLException;
+}
+// 这个东西的实现有点难懂.......
+```
+
+### SqlSession运行总结
+
+![1551337737331](../images/MyBatis-SqlSession内部运行图.png)
+
+建议自己写个查询，打断点debug细细品尝一下.......
 
 [返回头部](#简介)
 
-# :surfer:实用场景
+# 实用场景
