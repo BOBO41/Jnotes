@@ -22,8 +22,8 @@
 
 - [Java 基础](https://github.com/CyC2018/CS-Notes/blob/master/docs/notes/Java%20基础.md)[(转自CS-Notes)](https://github.com/CyC2018/CS-Notes)
 - [Java 容器](https://github.com/CyC2018/CS-Notes/blob/master/docs/notes/Java%20容器.md)[(转自CS-Notes)](https://github.com/CyC2018/CS-Notes)
-- [Java 并发](https://github.com/CyC2018/CS-Notes/blob/master/docs/notes/Java%20并发.md)[(转自CS-Notes)](https://github.com/CyC2018/CS-Notes)
-- [Java 虚拟机](https://github.com/huangdaren1997/Note/tree/master/Java/4.Java%20%E8%99%9A%E6%8B%9F%E6%9C%BA)
+- [Java 并发](./Java/Java%20并发/readme.md)
+- [Java 虚拟机](./Java/Java%20虚拟机/readme.md)
 - [Java I/O](https://github.com/CyC2018/CS-Notes/blob/master/docs/notes/Java%20IO.md)[(转自CS-Notes)](https://github.com/CyC2018/CS-Notes)
 - 网络编程
 - [Java Web](./Java/7.Java%20Web/readme.md)
