@@ -1,0 +1,166 @@
+---
+title : 4.线程的同步
+categories : 
+- JavaSE
+- ch11并发
+date : 2018-9-25
+---
+
+# 线程的同步
+
+## 为什么要同步？
+
+当多个线程同时操作一个可共享的资源变量时，操作的结果会变得无法预测，这就是同步问题。
+
+为解决同步问题，Java引入了同步锁机制从而避免共享资源变量在线程没有完成操作之前，被其他线程的调用，从而保证了该变量的唯一性和准确性。
+
+## 同步代码块
+
+为了解决同步问题，Java引入了同步机制，具体的做法实在会出现同步问题的代码前加上`synchronized`标志，这样的代码被称为同步代码块。
+
+```java
+public void withdrawal() {
+   synchronized (this){
+      // do something
+   }
+}
+```
+
+每个Java对象都有且只有一个同步锁，在任何时刻，最多只允许一个线程拥有这把锁。
+
+如果对象`A`的锁已经被线程`T1`所使用，那么需要使用对象`A`的锁的线程`T2`就会被虚拟机放入对象A的锁池中，当线程`T1`执行释放锁以后，虚拟机再从对象A的锁池中随机抽取一个线程，使这个线程拥有锁，并转到就绪状态。
+
+## 同步方法
+
+如果一个方法中所有代码都需要进行同步，那么可以直接用`synchronized`修饰这个方法。
+
+```java
+public synchronized void withdrawal() {
+      // do something
+}
+```
+
+## 线程同步需要注意的地方
+
+1. 如果同步代码和非同步代码共同操作共享资源，那么仍然会有同步问题。
+2. 每个对象有且只有一把锁
+3. `synchronized`还可以修饰静态方法
+4. 在执行同步代码块时，`Thread.sleed`和`Thread.yield`方法并不会释放锁，它们只是让出了CPU的使用权
+5. `synchronized`声明不会被继承
+
+## 释放对象的锁
+
+线程会在以下情况释放锁
+
+- 执行完同步代码
+- 执行同步代码的过程中，出现了异常导致线程终止
+- 执行同步代码的过程中，调用了锁所属对象的`wait()`方法
+
+## 死锁
+
+当线程A等待线程B的锁，线程B又等待线程A的锁，这种情况就是死锁。
+
+## 生产者消费者模式
+
+synchronized 确保一个方法不能被多个线程同时执行。
+
+使用标记和Object.wait() Object.notify(),让线程在正确的时机运行。
+
+```java
+package ThreadDemo;
+
+public class ProducterConsumer {
+    public static void main(String[] args) {
+        Food food = new Food();
+        Thread pt = new Thread(new Producter(food));
+        Thread ct = new Thread(new Consumer(food));
+        pt.start();
+        ct.start();
+    }
+}
+
+class Food {
+    private String name;
+    private String desc;
+    public boolean isReady = false;
+
+    public synchronized void set(String name, String desc) {
+        // 判断
+        if (this.isReady) {
+            try {
+                System.out.println("别急呢，食物还没吃完");
+                this.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        // 设值
+        this.name = name;
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        this.desc = desc;
+        // 修改
+        this.isReady = true;
+        this.notify();
+    }
+
+    public synchronized void get() {
+        // 判断
+        if (!this.isReady) {
+            try {
+                System.out.println("别急呢，食物还没做好呢");
+                this.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        // 输出
+        System.out.println(this.name + "--" + this.desc);
+        // 设值
+        this.isReady = false;
+        this.notify();
+    }
+
+
+}
+
+class Producter implements Runnable {
+    private Food food;
+    private String name;
+    private String desc;
+    public Producter(Food food) {
+        this.food = food;
+    }
+
+    @Override
+    public void run() {
+
+        for (int i = 0; i < 10; i++) {
+            name = i % 2 == 0 ? "叉烧" : "饼干";
+            desc = i % 2 == 0 ? "美味可口" : "充饥神器";
+            this.food.set(name, desc);
+        }
+
+
+    }
+}
+
+class Consumer implements Runnable {
+    private Food food;
+
+    public Consumer(Food food) {
+        this.food = food;
+    }
+
+    @Override
+    public void run() {
+        for (int i = 0; i < 10; i++) {
+            this.food.get();
+        }
+    }
+}
+```
+
