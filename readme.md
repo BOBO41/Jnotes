@@ -8,13 +8,10 @@
 ## :rocket: ​数据结构与算法
 
 - [剑指 Offer 题解](https://github.com/CyC2018/CS-Notes/blob/master/docs/notes/剑指%20offer%20题解.md)  [(转自CS-Notes)](https://github.com/CyC2018/CS-Notes)
-- [Leetcode 题解](https://github.com/CyC2018/CS-Notes/blob/master/docs/notes/Leetcode%20题解.md)   [(转自CS-Notes)](https://github.com/CyC2018/CS-Notes)
-- [算法](https://github.com/CyC2018/CS-Notes/blob/master/docs/notes/算法.md)  [(转自CS-Notes)](https://github.com/CyC2018/CS-Notes)
 
 ## :computer: 操作系统
 
 - [计算机操作系统](https://github.com/CyC2018/CS-Notes/blob/master/docs/notes/计算机操作系统.md)  [(转自CS-Notes)](https://github.com/CyC2018/CS-Notes)
-- [Linux](https://github.com/CyC2018/CS-Notes/blob/master/docs/notes/Linux.md)  [(转自CS-Notes)](https://github.com/CyC2018/CS-Notes)
 
 ## :cloud: 计算机网络 
 
@@ -33,8 +30,6 @@
 ## :floppy_disk: 数据库 
 
 -   [数据库系统原理](https://github.com/CyC2018/CS-Notes/blob/master/docs/notes/数据库系统原理.md)[(转自CS-Notes)](https://github.com/CyC2018/CS-Notes)
--   [SQL](https://github.com/CyC2018/CS-Notes/blob/master/docs/notes/SQL.md)[(转自CS-Notes)](https://github.com/CyC2018/CS-Notes)
--   [Leetcode-Database 题解](https://github.com/CyC2018/CS-Notes/blob/master/docs/notes/Leetcode-Database%20题解.md)[(转自CS-Notes)](https://github.com/CyC2018/CS-Notes)
 -   [MySQL](./数据库/MySQL/readme.md)
 -   [Redis](https://github.com/CyC2018/CS-Notes/blob/master/docs/notes/Redis.md)[(转自CS-Notes)](https://github.com/CyC2018/CS-Notes)
 
