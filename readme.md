@@ -25,7 +25,6 @@
 - [Java I/O](https://github.com/CyC2018/CS-Notes/blob/master/docs/notes/Java%20IO.md)
 - 网络编程 (迁移中........)
 - [Java Web](./Java/7.Java%20Web/readme.md)
-- 代码规范 (迁移中........)
 - 设计模式 (迁移中........)
 
 ## :floppy_disk: 数据库 
