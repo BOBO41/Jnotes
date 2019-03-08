@@ -139,7 +139,7 @@ SHOW ENGINES;
 
 `InnoDB`是MySQL的默认存储引擎，它具有以下功能：
 
--   其表在执行提交和回滚操作时是事物安全的。
+-   其表在执行提交和回滚操作时是事务安全的。
 -   在系统崩溃后可以自动回复。
 -   外键和引用完整性支持，包括级联删除和更新。
 
@@ -392,7 +392,7 @@ SELECT * FROM t1 INNER JOIN t2 ON t1.i1 = t2.i2
 
 #### 左（外）连接和右（外）连接
 
-内连接只会显示在连个表里都匹配上的行。外连接除了显示同样的结果，还可以把其中一个表在另一个表没有匹配的行也显示出来。左连接就是把左表里没有匹配的内容也显示出来。
+内连接只会显示在连接表里都匹配上的行。外连接除了显示同样的结果，还可以把其中一个表在另一个表没有匹配的行也显示出来。左连接就是把左表里没有匹配的内容也显示出来。
 
 ```sql
 SELECT *
@@ -468,7 +468,7 @@ SELECT i FROM t1 UNION SELECT j FROM t2 UNION  SELECT k FROM t3;
 
 -   ORDER BY 和 LIMIT处理
 
-    如果想对UNION结果作为一个整天进行排序，那么需要用括号把每个SELECT语句括起来，并在最后加上ORDER BY子句。ORDER BY子句必须引用第一个SELECT语句选中的列名。
+    如果想对UNION结果作为一个整体进行排序，那么需要用括号把每个SELECT语句括起来，并在最后加上ORDER BY子句。ORDER BY子句必须引用第一个SELECT语句选中的列名。
 
     ```sql
     (SELECT i FROM t1) UNION ALL (SELECT j FROM t2) UNION ALL (SELECT k FROM t3) 
@@ -480,9 +480,9 @@ SELECT i FROM t1 UNION SELECT j FROM t2 UNION  SELECT k FROM t3;
 在编写涉及多表的DELETE语句时，需要把所有涉及的表全部列在FROM子句里，并把用来匹配表中各行的检索条件写在WHERE子句里。
 
 ```sql
-DELETE t1 FROM t1 INNDER JOIN t2 ON t1.id=t2.id;
-DELETE t1,t2 FROM t1 INNER JOIN t2 ON t1.id = t2.id;
-DELETE t1 FROM t1 LEAF JOIN t2 ON t1.id = t2.id WHERE t2.id IS NULL;
+DELETE FROM t1 INNER JOIN t2 ON t1.id=t2.id;
+DELETE FROM t1 INNER JOIN t2 ON t1.id = t2.id;
+DELETE FROM t1 LEAF JOIN t2 ON t1.id = t2.id WHERE t2.id IS NULL;
 
 DELETE FROM t1 USING t1 INNDER JOIN t2 ON t1.id = t2.id;
 DELETE FROM t1,t2 USING t1 INNDER JOIN t2 ON t1.id = t2.id;
@@ -502,3 +502,13 @@ UPDATE t1, t2 SET t2.a = t1.a WHERE t2.id = t1.id;
 ```
 
 [返回头部](#数据库的CRUD)
+
+
+
+# 练习
+
+```mysql
+# 工资第n大
+SELECT DISTINCT Salary FROM Employee ORDER BY Salary DESC LIMIT M, 1;
+```
+
