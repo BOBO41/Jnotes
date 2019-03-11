@@ -38,8 +38,6 @@ public class DbConfig {
 
 在实际生产中，你可以使用Apache Commons `BasicDataSource` 或者其它。
 
-另一种配置`DataSource Bean`的方法是使用JNDI。未完待续
-
 ## 内置数据库支持
 
 从Spring3.0开始，Spring提供内置数据库支持，下面是配置内置数据库的一些代码

@@ -401,6 +401,8 @@ FROM t1
 ORDER BY t1.i1 ASC;
 ```
 
+![](../images/SQL join.jpg)
+
 ### 2.使用子查询实现多表检索
 
 子查询：用括号括起来，并嵌入另一条语句里的那条SELECT语句。
