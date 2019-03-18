@@ -1,0 +1,6 @@
+FROM image? AS ??
+MAINTAINER huangdaren huangdaren1997@gmail.com
+# change the source.list
+RUN mv /etc/apt/sources.list /etc/apt/sources.list.backup
+COPY ./sources.list /etc/apt/
+RUN apt update
