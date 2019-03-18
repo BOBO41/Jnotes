@@ -14,28 +14,9 @@ xrandr --newmode "1440x900_60.00"  106.50  1440 1528 1672 1904  900 903 909 934 
 xrandr --addmode VGA-1 "1440x900_60.00"
 ```
 
-### Shadowsocks
+### 开机运行脚本
 
 ```shell
-#安装shadowsocks
-sudo apt-get install python-pip
-sudo apt-get install python-setuptools m2crypto
-sudo apt install shadowsocks
-#编写配置文件
-cat > /home/hdr/App/Tools/SSR/config.json <<EOL
-{
-"server":"xxxxx",
-"server_port":xx,
-"local_address": "127.0.0.1",
-"local_port":1080,
-"password":"xx",
-"timeout":300,
-"method":"aes-256-cfb",
-"fast_open": false,
-"workers": 1
-}
-EOL
-
 #开机启动
 sudo cat > /etc/init.d/excu_on_start.sh <<EOL
 #!/bin/bash
@@ -48,7 +29,7 @@ sudo cat > /etc/init.d/excu_on_start.sh <<EOL
 # Short-Description: starts the svnd.sh daemon
 # Description:       starts svnd.sh using start-stop-daemon
 ### END INIT INFO
-sslocal -c /home/hdr/App/Tools/SSR/config.json
+v2ray --config=/home/hdr/App/Tools/V2ray/config.json
 EOL
 #使文件可执行
 cd /etc/init.d/
@@ -65,7 +46,7 @@ sudo pip install genpac
 genpac --format pac --gfwlist-url=https://raw.githubusercontent.com/gfwlist/gfwlist/master/gfwlist.txt --pac-proxy="SOCKS5 127.0.0.1:1080"  --output="autoproxy.pac"
 #设置系统使用
 gsettings set org.gnome.system.proxy mode 'auto'
-gsettings set org.gnome.system.proxy autoconfig-url "file:///home/hdr/App/Tools/SSR/autoproxy.pac"
+gsettings set org.gnome.system.proxy autoconfig-url "file:///home/hdr/App/Tools/V2ray/autoproxy.pac"
 ```
 
 ### 添加环境变量
@@ -206,8 +187,11 @@ $  PATH ="$PATH:."
 # 使用耳机
 pacmd list-sinks
 pacmd set-sink-port 2 analog-output-headphones
+pacmd set-sink-port 5 analog-output-lineout
 # 开机默认使用使用耳机 在/etc/pulse/default.pa 文件最后添加
 set-sink-port 2 analog-output-headphones
+# 音频管理工具
+sudo apt install pavucontrol
 ```
 
 ### 设置开机启动项
@@ -251,6 +235,7 @@ sudo ubuntu-drivers autoinstall
 https://extensions.gnome.org/
 # 下载chrome-gnome-shell
 sudo apt install chrome-gnome-shell
+sudo apt install gnome-shell-extensions
 ```
 
 ### 安装主题
@@ -263,8 +248,8 @@ mkdir ~/.themes
 ### 安装papirus图标
 
 ```shell
-sudo add-apt-repository ppa:papirus/papirus
-sudo apt-get update
+sudo add-apt-repository ppa:papirus/papirus 
+sudo apt-get update 
 sudo apt-get install papirus-icon-theme
 sudo apt install gnome-icon-theme
 ```
@@ -280,21 +265,22 @@ sudo mkfontdir
 sudo fc-cache -fv 
 ```
 
-### 安装system-monitor
+### 安装插件
 
 ```shell
+# 安装系统监视器
 sudo apt-get remove indicator-multiload
 sudo apt-get install gir1.2-gtop-2.0 gir1.2-networkmanager-1.0  gir1.2-clutter-1.0
-重启
+搜索system-monitor插件
+# 安装dash to panle
 ```
 
-### 其他
+### Termintor + oh my zsh
 
-```sh
-dash to panle
 ```
-
-
+https://gnometerminator.blogspot.com/p/introduction.html
+https://github.com/robbyrussell/oh-my-zsh
+```
 
 ## 办公软件
 
@@ -343,7 +329,7 @@ sudo apt-get -f install
 sudo dpkg -i netease-cloud-music_1.1.0_amd64_ubuntu.deb
 # 额外设置
 sudo gedit /etc/sudoers
-修改/etc/sudoers文件，加一行：
+修改/etc/sudoers文件，在文件最下面加一行：
 YOURNAME ALL = NOPASSWD: /usr/bin/netease-cloud-music
 YOURNAME为你登录的用户名。
 
@@ -374,11 +360,17 @@ mv wps-office_10.1.0.6757_x86_64 WPS
 
 ### 安装sogo输入法
 
+```
+官网下载，然后直接双击安装
+```
+
+### 安装Franz
+
+```
+https://meetfranz.com/#download
+```
+
 ## 开发软件
-
-### 安装IDEA
-
-
 
 ### Java8
 ```shell
@@ -425,8 +417,6 @@ sudo vim /etc/redis/redis.conf
 requirepass !@#$
 ```
 
-
-
 ### MongoDB
 
 #### 安装
@@ -458,14 +448,7 @@ sudo systemctl enable mongodb
 sudo systemctl disable mongodb
 ```
 
-
-
 ### Tomcat
-
-```shell
-wget http://mirrors.ibiblio.org/apache/tomcat/tomcat-8/v8.5.34/bin/apache-tomcat-8.5.34.tar.gz
-
-```
 
 ### Postman 
 
