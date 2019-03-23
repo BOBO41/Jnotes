@@ -1,6 +1,337 @@
 # Ubuntu Manual
 
-## 配置
+- 上代理
+- 基本系统设置
+- 安装软件
+
+## 代理
+
+### v2ray
+
+```shell
+sudo mkdir -p /home/hdr/app/tools/v2ray
+
+cd /home/hdr/app/tools/v2ray
+
+sudo apt install python-pip -y
+sudo pip install genpac
+genpac --format pac --gfwlist-url=https://raw.githubusercontent.com/gfwlist/gfwlist/master/gfwlist.txt --pac-proxy="SOCKS5 127.0.0.1:1080"  --output="autoproxy.pac"
+
+#开机启动
+sudo cat > /etc/init.d/excu_on_start.sh <<EOL
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides:          svnd.sh
+# Required-start:    $local_fs $remote_fs $network $syslog
+# Required-Stop:     $local_fs $remote_fs $network $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: starts the svnd.sh daemon
+# Description:       starts svnd.sh using start-stop-daemon
+### END INIT INFO
+sh /home/hdr/app/tools/v2ray/v2ray --config=/home/hdr/app/tools/v2ray/config.json
+EOL
+
+#使文件可执行
+cd /etc/init.d/
+sudo chmod 775 excu_on_start.sh
+#设置启动顺序
+sudo update-rc.d excu_on_start.sh defaults 95
+#停止启动
+#cd /etc/init.d
+#sudo update-rc.d -f excu_on_start.sh remove
+
+sudo chown -R hdr /home/hdr/app/tools
+sudo chgrp -R hdr /home/hdr/app/tools
+
+#设置系统使用
+gsettings set org.gnome.system.proxy mode 'auto'
+gsettings set org.gnome.system.proxy autoconfig-url "file:///home/hdr/app/tools/v2ray/autoproxy.pac"
+
+echo "please install v2ray-core to /home/hdr/app/tools/v2ray"
+```
+
+
+
+## 系统基本设置
+
+### gnome前期准备
+
+```bash
+# 下载浏览器插件
+https://extensions.gnome.org/
+# 下载chrome-gnome-shell
+sudo apt install chrome-gnome-shell
+sudo apt install gnome-shell-extensions
+```
+
+### 安装主题
+
+```bash
+mkdir ~/.themes
+# 主题 现在用的是Macterial
+```
+
+### 安装papirus图标
+
+```shell
+sudo add-apt-repository ppa:papirus/papirus 
+sudo apt-get update 
+sudo apt-get install papirus-icon-theme
+sudo apt install gnome-icon-theme
+```
+
+### 安装字体
+
+```shell
+下载ttf字体文件,然后在/usr/share/fonts下新建目录,把新字体放进该目录
+进入新目录
+sudo chmod 775 字体文件
+sudo mkfontscale
+sudo mkfontdir
+sudo fc-cache -fv 
+```
+
+### 安装插件
+
+```shell
+# 安装系统监视器
+sudo apt-get remove indicator-multiload
+sudo apt-get install gir1.2-gtop-2.0 gir1.2-networkmanager-1.0  gir1.2-clutter-1.0
+搜索system-monitor插件
+# 安装dash to panle
+```
+
+### Termintor + oh my zsh
+
+```
+https://gnometerminator.blogspot.com/p/introduction.html
+https://github.com/robbyrussell/oh-my-zsh
+```
+
+## 常用工具
+
+### 安装VIm
+
+```shell
+sudo apt-get remove vim-common
+sudo apt-get install vim
+```
+
+### 安装Typora
+
+```shell
+# or run:
+# sudo apt-key adv --keyserver keyserver.ubuntu.com--recv-keys BA300B7755AFCFAE
+wget -qO - https://typora.io/linux/public-key.asc | sudo apt-key add -
+
+# add Typora's repository
+sudo add-apt-repository 'deb https://typora.io/linux ./'
+sudo apt-get update
+
+# install typora
+sudo apt-get install typora
+```
+
+### 安装Pomodoro
+
+```shell
+sudo apt-get install gnome-shell-pomodoro
+```
+
+### 安装XMIND
+
+```shell
+https://www.xmind.net/download/
+```
+
+
+
+### 安装网易云
+
+```shell
+wget http://d1.music.126.net/dmusic/netease-cloud-music_1.1.0_amd64_ubuntu.deb
+sudo dpkg -i netease-cloud-music_1.1.0_amd64_ubuntu.deb
+sudo apt-get -f install
+sudo dpkg -i netease-cloud-music_1.1.0_amd64_ubuntu.deb
+# 额外设置
+sudo gedit /etc/sudoers
+修改/etc/sudoers文件，在文件最下面加一行：
+YOURNAME ALL = NOPASSWD: /usr/bin/netease-cloud-music
+YOURNAME为你登录的用户名。
+
+sudo gedit /usr/share/applications/netease-cloud-music.desktop
+修改Exec=netease-cloud-music %U 为  Exec=sudo netease-cloud-music %U,
+这样点击网易云音乐图标就是以管理员权限启动的了，且不用输入密码。
+
+```
+
+### 安装Chrome
+
+```shell
+sudo wget https://repo.fdzh.org/chrome/google-chrome.list -P /etc/apt/sources.list.d/
+wget -q -O - https://dl.google.com/linux/linux_signing_key.pub  | sudo apt-key add -
+sudo apt-get update
+sudo apt-get install google-chrome-stable
+# 删除 firefox
+sudo apt remove --purge firefox
+```
+
+### 安装WPS
+
+```shell
+wget http://kdl.cc.ksosoft.com/wps-community/download/6757/wps-office_10.1.0.6757_x86_64.tar.xz
+xz -d wps-office_10.1.0.6757_x86_64.tar.xz
+tar -xvf wps-office_10.1.0.6757_x86_64.tar
+mv wps-office_10.1.0.6757_x86_64 WPS
+```
+
+### 安装sogo输入法
+
+```
+官网下载，然后直接双击安装
+```
+
+### 安装Franz
+
+```
+https://meetfranz.com/#download
+```
+
+## 开发工具
+
+### Java8
+
+```shell
+# 安装
+sudo add-apt-repository ppa:webupd8team/java
+sudo apt-get update
+sudo apt-get install oracle-java8-installer
+# 设置Java_HOME
+sudo update-alternatives --config java
+sudo vim /etc/environment
+JAVA_HOME="/usr/lib/jvm/java-8-oracle"
+PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/jvm/java-8-oracle/bin"
+```
+
+### MySQL
+
+```shell
+wget https://dev.mysql.com/get/mysql-apt-config_0.8.10-1_all.deb
+安装执行，选择MySQL8.0，OK。
+sudo dpkg -i mysql-apt-config_0.8.10-1_all.deb 
+sudo apt update 
+sudo apt install -y mysql-server
+#注意
+选择 Use Legacy Authentication Method
+----------------------------------------------------------------------------
+#全部卸载
+sudo apt purge mysql-*
+sudo rm -rf /etc/mysql/ /var/lib/mysql
+sudo apt autoremove
+sudo apt autoclean
+```
+
+### Redis
+
+```shell
+sudo apt install redis 
+sudo vim /etc/redis/redis.conf
+requirepass !@#$
+```
+
+### MongoDB
+
+```shell
+# 安装MongoDB Service
+sudo apt install -y mongodb
+# 安装MongoDB Compass
+wget https://downloads.mongodb.com/compass/mongodb-compass_1.15.1_amd64.deb;
+sudo dpkg -i mongodb-compass_1.15.1_amd64.deb;
+# 检查MongoDB信息
+mongo --eval 'db.runCommand({ connectionStatus: 1 })'
+```
+
+**管理MongoDB Service**
+
+```shell
+# 查看运行状态
+sudo systemctl status mongodb
+# 启动
+sudo systemctl start mongodb
+# 停止
+sudo systemctl stop mongodb
+# 重新启动
+sudo systemctl restart mongodb
+# 允许开机启动
+sudo systemctl enable mongodb
+# 禁止开机启动
+sudo systemctl disable mongodb
+```
+
+### Tomcat
+
+### Postman 
+
+```shell
+wget https://dl.pstmn.io/download/latest/linux64 -O postman.tar.gz
+sudo tar -xzf postman.tar.gz -C ~/App
+rm postman.tar.gz
+sudo ln -s ~/App/Postman/Postman /usr/bin/postman
+# 添加到启动器
+cat > ~/.local/share/applications/postman.desktop <<EOL
+[Desktop Entry]
+Encoding=UTF-8
+Name=Postman
+Exec=postman
+Icon=/home/hdr/App/Tools/Postman/app/resources/app/assets/icon.png
+Terminal=false
+Type=Application
+Categories=Development;
+EOL
+sudo apt install libcanberra-gtk-module libcanberra-gtk3-module
+```
+
+### Maven
+
+```shell
+# 安装Maven
+wget http://mirrors.advancedhosters.com/apache/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.tar.gz
+# 修改Maven源
+    <mirror>
+      <id>alimaven</id>
+      <name>aliyun maven</name>
+      <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+      <mirrorOf>central</mirrorOf>        
+    </mirror>
+# MAVEN_HOME
+参照JAVA_HOME
+```
+
+### Gradle
+
+```shell
+wget https://services.gradle.org/distributions/gradle-3.4.1-bin.zip
+sudo unzip -d ~/App/JavaAbout/Gradle/ gradle-3.4.1-bin.zip 
+rm gradle-3.4.1-bin-zip
+sudo ln -s ~/App/JavaAbout/Gradle/gradle-3.4.1/bin/gradle /usr/bin/gradle
+# 添加到启动器
+cat > ~/.local/share/applications/gradle.desktop <<EOL
+[Desktop Entry]
+Encoding=UTF-8
+Name=Gradle
+Exec=gradle
+Icon=/home/hdr/App/JavaAbout/Gradle/gradle-3.4.1/media/gradle-icon-128x128.png
+Terminal=false
+Type=Application
+Categories=Development;
+EOL
+
+```
+
+
+
+## 常见问题
 
 
 ### 添加分辨率
@@ -14,39 +345,66 @@ xrandr --newmode "1440x900_60.00"  106.50  1440 1528 1672 1904  900 903 909 934 
 xrandr --addmode VGA-1 "1440x900_60.00"
 ```
 
-### 开机运行脚本
+### 默认使用前置耳机
+
+```bash
+# 使用耳机
+pacmd list-sinks
+pacmd set-sink-port 2 analog-output-headphones
+pacmd set-sink-port 5 analog-output-lineout
+# 开机默认使用使用耳机 在/etc/pulse/default.pa 文件最后添加
+set-sink-port 2 analog-output-headphones
+# 音频管理工具
+sudo apt install pavucontrol
+```
+
+### 设置开机启动项
 
 ```shell
-#开机启动
-sudo cat > /etc/init.d/excu_on_start.sh <<EOL
-#!/bin/bash
-### BEGIN INIT INFO
-# Provides:          svnd.sh
-# Required-start:    $local_fs $remote_fs $network $syslog
-# Required-Stop:     $local_fs $remote_fs $network $syslog
-# Default-Start:     2 3 4 5
-# Default-Stop:      0 1 6
-# Short-Description: starts the svnd.sh daemon
-# Description:       starts svnd.sh using start-stop-daemon
-### END INIT INFO
-v2ray --config=/home/hdr/App/Tools/V2ray/config.json
-EOL
-#使文件可执行
-cd /etc/init.d/
-sudo chmod 775 excu_on_start.sh
-#设置启动顺序
-sudo update-rc.d excu_on_start.sh defaults 95
-#停止启动
-#cd /etc/init.d
-#sudo update-rc.d -f excu_on_start.sh remove
+sudo systemctl disable mysql #停止mysql开机运行
+systemd-analyze blame # 分析开机时间
+```
 
-#生成PAC文件
-cd /home/hdr/Documents/shadowsocks/
-sudo pip install genpac
-genpac --format pac --gfwlist-url=https://raw.githubusercontent.com/gfwlist/gfwlist/master/gfwlist.txt --pac-proxy="SOCKS5 127.0.0.1:1080"  --output="autoproxy.pac"
-#设置系统使用
-gsettings set org.gnome.system.proxy mode 'auto'
-gsettings set org.gnome.system.proxy autoconfig-url "file:///home/hdr/App/Tools/V2ray/autoproxy.pac"
+### N卡驱动
+
+The objective is to install the NVIDIA drivers on Ubuntu 18.04 Bionic Beaver Linux. This article will discuss three methods of Nvidia driver installation in the following order:
+
+- Automatic Install using standard Ubuntu Repository
+- Automatic Install using PPA repository to install Nvidia Beta drivers
+- Manual Install using the Official nvidia.com driver
+
+```bash
+ $ ubuntu-drivers devices
+== /sys/devices/pci0000:00/0000:00:03.1/0000:1c:00.0 ==
+modalias : pci:v000010DEd00001C82sv00007377sd00000000bc03sc00i00
+vendor   : NVIDIA Corporation
+model    : GP107 [GeForce GTX 1050 Ti]
+driver   : nvidia-driver-390 - distro non-free recommended
+driver   : xserver-xorg-video-nouveau - distro free builtin
+```
+
+```bash
+sudo ubuntu-drivers autoinstall
+# Once the installation is concluded, reboot your system and you are done.
+```
+
+
+
+### 进入单用户模式
+
+```shell
+- 开机的时候按住shift
+- 上下移动到Ubuntu高级模式然后按e
+- 上下移动到recovery模式然后按e
+- 把 ro recovery nomodest 改为 rw single init=/bin/bash
+- 按ctrl+x进入单用户模式
+- 退出单用户模式 ctrl+alt+delete
+```
+
+### 中文输入法突然实效
+
+```shell
+rm -r /home/用户名/.cache/ibus/*pinyin
 ```
 
 ### 添加环境变量
@@ -178,352 +536,4 @@ $  PATH ="$PATH:."
 四、小结
 
 综上所述，在Ubuntu 系统中/etc/profile文件是全局的环境变量配置文件，它适用于所有的shell。在我们登陆Linux系统时，首先启动/etc/profile文件，然后再启动用户目录下的~/.bash_profile、~/.bash_login或~/.profile文件中的其中一个，执行的顺序和上面的排序一样。如果~/.bash_profile文件存在的话，一般还会执行~/.bashrc文件。
-
 ```
-
-### 默认使用前置耳机
-
-```bash
-# 使用耳机
-pacmd list-sinks
-pacmd set-sink-port 2 analog-output-headphones
-pacmd set-sink-port 5 analog-output-lineout
-# 开机默认使用使用耳机 在/etc/pulse/default.pa 文件最后添加
-set-sink-port 2 analog-output-headphones
-# 音频管理工具
-sudo apt install pavucontrol
-```
-
-### 设置开机启动项
-
-```shell
-sudo systemctl disable mysql #停止mysql开机运行
-systemd-analyze blame # 分析开机时间
-```
-
-### N卡驱动
-
-The objective is to install the NVIDIA drivers on Ubuntu 18.04 Bionic Beaver Linux. This article will discuss three methods of Nvidia driver installation in the following order:
-
-- Automatic Install using standard Ubuntu Repository
-- Automatic Install using PPA repository to install Nvidia Beta drivers
-- Manual Install using the Official nvidia.com driver
-
-```bash
- $ ubuntu-drivers devices
-== /sys/devices/pci0000:00/0000:00:03.1/0000:1c:00.0 ==
-modalias : pci:v000010DEd00001C82sv00007377sd00000000bc03sc00i00
-vendor   : NVIDIA Corporation
-model    : GP107 [GeForce GTX 1050 Ti]
-driver   : nvidia-driver-390 - distro non-free recommended
-driver   : xserver-xorg-video-nouveau - distro free builtin
-```
-
-```bash
-sudo ubuntu-drivers autoinstall
-# Once the installation is concluded, reboot your system and you are done.
-```
-
-
-
-## 美化
-
-### gnome前期准备
-
-```bash
-# 下载浏览器插件
-https://extensions.gnome.org/
-# 下载chrome-gnome-shell
-sudo apt install chrome-gnome-shell
-sudo apt install gnome-shell-extensions
-```
-
-### 安装主题
-
-```bash
-mkdir ~/.themes
-# 主题 现在用的是Macterial
-```
-
-### 安装papirus图标
-
-```shell
-sudo add-apt-repository ppa:papirus/papirus 
-sudo apt-get update 
-sudo apt-get install papirus-icon-theme
-sudo apt install gnome-icon-theme
-```
-
-### 安装字体
-
-```shell
-下载ttf字体文件,然后在/usr/share/fonts下新建目录,把新字体放进该目录
-进入新目录
-sudo chmod 775 字体文件
-sudo mkfontscale
-sudo mkfontdir
-sudo fc-cache -fv 
-```
-
-### 安装插件
-
-```shell
-# 安装系统监视器
-sudo apt-get remove indicator-multiload
-sudo apt-get install gir1.2-gtop-2.0 gir1.2-networkmanager-1.0  gir1.2-clutter-1.0
-搜索system-monitor插件
-# 安装dash to panle
-```
-
-### Termintor + oh my zsh
-
-```
-https://gnometerminator.blogspot.com/p/introduction.html
-https://github.com/robbyrussell/oh-my-zsh
-```
-
-## 办公软件
-
-### 安装VIm
-
-```shell
-sudo apt-get remove vim-common
-sudo apt-get install vim
-```
-
-### 安装Typora
-
-```shell
-# or run:
-# sudo apt-key adv --keyserver keyserver.ubuntu.com--recv-keys BA300B7755AFCFAE
-wget -qO - https://typora.io/linux/public-key.asc | sudo apt-key add -
-
-# add Typora's repository
-sudo add-apt-repository 'deb https://typora.io/linux ./'
-sudo apt-get update
-
-# install typora
-sudo apt-get install typora
-```
-
-### 安装Pomodoro
-
-```shell
-sudo apt-get install gnome-shell-pomodoro
-```
-
-### 安装XMIND
-
-```shell
-https://www.xmind.net/download/
-```
-
-
-
-### 安装网易云
-
-```shell
-wget http://d1.music.126.net/dmusic/netease-cloud-music_1.1.0_amd64_ubuntu.deb
-sudo dpkg -i netease-cloud-music_1.1.0_amd64_ubuntu.deb
-sudo apt-get -f install
-sudo dpkg -i netease-cloud-music_1.1.0_amd64_ubuntu.deb
-# 额外设置
-sudo gedit /etc/sudoers
-修改/etc/sudoers文件，在文件最下面加一行：
-YOURNAME ALL = NOPASSWD: /usr/bin/netease-cloud-music
-YOURNAME为你登录的用户名。
-
-sudo gedit /usr/share/applications/netease-cloud-music.desktop
-修改Exec=netease-cloud-music %U 为  Exec=sudo netease-cloud-music %U,
-这样点击网易云音乐图标就是以管理员权限启动的了，且不用输入密码。
-
-```
-
-### 安装Chrome
-
-```shell
-sudo wget https://repo.fdzh.org/chrome/google-chrome.list -P /etc/apt/sources.list.d/
-wget -q -O - https://dl.google.com/linux/linux_signing_key.pub  | sudo apt-key add -
-sudo apt-get update
-sudo apt-get install google-chrome-stable
-# 删除 firefox
-sudo apt remove --purge firefox
-```
-### 安装WPS
-
-```shell
-wget http://kdl.cc.ksosoft.com/wps-community/download/6757/wps-office_10.1.0.6757_x86_64.tar.xz
-xz -d wps-office_10.1.0.6757_x86_64.tar.xz
-tar -xvf wps-office_10.1.0.6757_x86_64.tar
-mv wps-office_10.1.0.6757_x86_64 WPS
-```
-
-### 安装sogo输入法
-
-```
-官网下载，然后直接双击安装
-```
-
-### 安装Franz
-
-```
-https://meetfranz.com/#download
-```
-
-## 开发软件
-
-### Java8
-```shell
-# 安装
-sudo add-apt-repository ppa:webupd8team/java
-sudo apt-get update
-sudo apt-get install oracle-java8-installer
-# 设置Java_HOME
-sudo update-alternatives --config java
-sudo vim /etc/environment
-JAVA_HOME="/usr/lib/jvm/java-8-oracle"
-PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/jvm/java-8-oracle/bin"
-```
-
-### MySQL
-```shell
-#安装MySQL
-#坑
-sudo apt install mysql-server
-默认会安装MySQL 5.7，将会出现一些莫名的问题，例如：安装过程没有要求输入root密码，而登录mysql时会要求密码
-阅读了一下MySQL安装指南，发现MySQL5.7版本最高只适配到Ubuntu17.04，而MySQL8.0最高适配到Ubuntu18.04。
-#解决办法
-wget https://dev.mysql.com/get/mysql-apt-config_0.8.10-1_all.deb
-安装执行，选择MySQL8.0，OK。
-sudo apt update
-sudo apt install mysql-server
-#注意
-选择 Use Legacy Authentication Method
-----------------------------------------------------------------------------
-#安装MySql work-bench
-官网下载deb包，安装，然后解决依赖，然后再次安装
-#全部卸载
-sudo apt purge mysql-*
-sudo rm -rf /etc/mysql/ /var/lib/mysql
-sudo apt autoremove
-sudo apt autoclean
-```
-
-### Redis
-
-```shell
-sudo apt install redis 
-sudo vim /etc/redis/redis.conf
-requirepass !@#$
-```
-
-### MongoDB
-
-#### 安装
-
-```shell
-# 安装MongoDB Service
-sudo apt install -y mongodb
-# 安装MongoDB Compass
-wget https://downloads.mongodb.com/compass/mongodb-compass_1.15.1_amd64.deb;
-sudo dpkg -i mongodb-compass_1.15.1_amd64.deb;
-# 检查MongoDB信息
-mongo --eval 'db.runCommand({ connectionStatus: 1 })'
-```
-
-#### 管理MongoDB Service
-
-```shell
-# 查看运行状态
-sudo systemctl status mongodb
-# 启动
-sudo systemctl start mongodb
-# 停止
-sudo systemctl stop mongodb
-# 重新启动
-sudo systemctl restart mongodb
-# 允许开机启动
-sudo systemctl enable mongodb
-# 禁止开机启动
-sudo systemctl disable mongodb
-```
-
-### Tomcat
-
-### Postman 
-
-```shell
-wget https://dl.pstmn.io/download/latest/linux64 -O postman.tar.gz
-sudo tar -xzf postman.tar.gz -C ~/App
-rm postman.tar.gz
-sudo ln -s ~/App/Postman/Postman /usr/bin/postman
-# 添加到启动器
-cat > ~/.local/share/applications/postman.desktop <<EOL
-[Desktop Entry]
-Encoding=UTF-8
-Name=Postman
-Exec=postman
-Icon=/home/hdr/App/Tools/Postman/app/resources/app/assets/icon.png
-Terminal=false
-Type=Application
-Categories=Development;
-EOL
-sudo apt install libcanberra-gtk-module libcanberra-gtk3-module
-```
-
-### Maven
-
-```shell
-# 安装Maven
-wget http://mirrors.advancedhosters.com/apache/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.tar.gz
-# 修改Maven源
-    <mirror>
-      <id>alimaven</id>
-      <name>aliyun maven</name>
-      <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
-      <mirrorOf>central</mirrorOf>        
-    </mirror>
-# MAVEN_HOME
-参照JAVA_HOME
-```
-
-### Gradle
-
-```shell
-wget https://services.gradle.org/distributions/gradle-3.4.1-bin.zip
-sudo unzip -d ~/App/JavaAbout/Gradle/ gradle-3.4.1-bin.zip 
-rm gradle-3.4.1-bin-zip
-sudo ln -s ~/App/JavaAbout/Gradle/gradle-3.4.1/bin/gradle /usr/bin/gradle
-# 添加到启动器
-cat > ~/.local/share/applications/gradle.desktop <<EOL
-[Desktop Entry]
-Encoding=UTF-8
-Name=Gradle
-Exec=gradle
-Icon=/home/hdr/App/JavaAbout/Gradle/gradle-3.4.1/media/gradle-icon-128x128.png
-Terminal=false
-Type=Application
-Categories=Development;
-EOL
-
-```
-
-## 常见问题
-
-### 进入单用户模式
-
-```shell
-- 开机的时候按住shift
-- 上下移动到Ubuntu高级模式然后按e
-- 上下移动到recovery模式然后按e
-- 把 ro recovery nomodest 改为 rw single init=/bin/bash
-- 按ctrl+x进入单用户模式
-- 退出单用户模式 ctrl+alt+delete
-```
-
-### 中文输入法突然实效
-
-```shell
-rm -r /home/用户名/.cache/ibus/*pinyin
-```
-
