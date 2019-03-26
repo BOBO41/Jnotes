@@ -195,3 +195,170 @@ Maven拥有三套相互独立的生命周期。每个生命周期含有一些阶
 
 ## 插件绑定
 
+# 聚合与继承
+
+## 聚合
+
+一个项目往往由多个模块组成，我们需要分别对这些项目进行构建，这很麻烦，我们想要一个功能，就是一次就能把所有项目构建完毕。
+
+为了实现这个功能，我们需要创建一个额外的模块，通过这个模块构建整个项目的所有模块。下面是这个模块的POM文件。
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.hdr.mymall</groupId>
+    <artifactId>mymall-aggregator</artifactId>
+    <version>1.0-SNAPSHOT</version>
+	<packaging>pom</packaging> <!--对于聚合模块来说，它的打包方式必须是pom-->
+    <name>MyMall Aggregator</name>
+    
+    <modules>
+    	<module>mymall-account</module>
+        <module>mymall-order</module>
+        <!--这里每个module的值都该模块与聚合模块pom文件的相对位置-->
+    </modules>
+</project>
+```
+
+这时候对该聚合模块执行构建就会对所有模块进行构建。
+
+## 继承
+
+很多时候，一个项目的多个模块会共用一些依赖，如果每个在每个项目都导入这些依赖，那就太浪费了，这时候我们可以创建一个父模块，在父模块导入这些共用的依赖，子模块继承父模块即可得到那些依赖。
+
+```xml
+<!--父模块-->
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.hdr.learn</groupId>
+    <artifactId>maven-parent</artifactId>
+    <version>1.0-SNAPSHOT</version>
+	<packaging>pom</packaging> 
+    
+    <dependencies>
+    	<dependency>
+            ......
+        </dependency>
+    </dependencies>
+    
+
+</project>
+```
+
+```xml
+<!--子模块-->
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+   
+    <parent>
+    	<groupId></groupId>
+        <artifactId></artifactId>
+        <version></version>
+        <relativePath></relativePath>
+        <!--构建项目的时候，首先会根据relativePath检查父POM，如果找不到再从本地仓库找-->
+    </parent>
+    <!--这里没有声明groupId、version，因为它能继承父模块的-->
+    <artifactId>maven-son</artifactId>
+    
+    <dependencies>
+    	<dependency>
+            ......
+        </dependency>
+    </dependencies>
+    
+
+</project>
+```
+
+## 依赖管理
+
+有些时候，父模块导入的依赖不是所有子模块都需要的，这时候我们可以使用`dependencyManagement`元素。
+
+`dependencyManagement`元素下的依赖声明并不会引入实际的依赖，不过它能约束`dependencies`下的依赖使用。
+
+## 插件管理
+
+对于插件，同样也提供了`pluginsManagement`元素。
+
+# 使用Nexus创建私服
+
+# 使用Maven进行测试
+
+## 测试
+
+Maven本身并不是一个单元测试框架，Maven通过插件来执行JUnit、TestNG的测试用例。这一插件就是`maven-surefire-plugin`。通过`mvn test`命令即可执行测试。
+
+在默认情况下，`maven-surefire-plugin`的test目标会自动执行测试源码路径（src/test/java）下所有符合下面命名模式的测试类。
+
+- `**/Test*.java`
+- `**/*Test.java`
+- `**/*TestCase.java`
+
+## 跳过测试
+
+有时候我们需要Maven跳过测试。可以通过参数`skipTests`实现.`mvn package -D skipTests`。
+
+## 动态指定要运行的测试用例
+
+`mvn test -D test=RandomGeneratorTest`
+
+`mvn test -D test=TestOne,TestTwo`
+
+`mvn test -D test=*Test`
+
+## 包括与排除测试用例
+
+## 测试报告
+
+默认情况下，`maven-surefire-plugin`会在项目的`target/surefire-reports`目录下生成两种格式的错误报告：
+
+- 简单文本格式
+- 与JUnit兼容的XML格式
+
+**测试覆盖率报告**
+
+通过`cobertura-maven-plugin`我们可以为Maven项目生成测试覆盖率报告。
+
+`mvn cobertura:cobertura` 会在`target/site/cobertura/`下生成一个index.html文件，打开就能看到测试覆盖率报告。
+
+## 重用测试代码
+
+# 使用Hudson进行持续集成
+
+
+
+# 版本管理
+
+**版本管理：** 项目整体版本的演变过程管理
+
+**版本控制：** 借助版本控制工具追踪代码的每一个变更
+
+## Maven版本号定义约定
+
+Maven的版本号约定是这样的：`主版本号.次版本号.增量版本-里程碑版本`。
+
+主版本：表示项目重大架构的变更
+
+次版本：表示较大范围 的功能增大和变化，及bug修复
+
+增量版本：一般表示重大Bug的修复
+
+里程碑版本：
+
+## 自动化版本发布
+
+发布一个版本往往需要走很多个流程，因此Maven提供了`Maven-Release-Plugin`。
+
+该插件主要有三个目标。`release：prepare`、`release：rollback`、`release：perform`。
+
+# 常用Maven插件
+
