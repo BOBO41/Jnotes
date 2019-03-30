@@ -2,7 +2,7 @@
 -   Servlet
 -   Spring
 -   Spring MVC
--   [MyBatis](./MyBatis.md)
+-   [MyBatis](./4.持久层/MyBatis.md)
 -   SpringBoot
 -   JSP
 -   ThymeLeaf
