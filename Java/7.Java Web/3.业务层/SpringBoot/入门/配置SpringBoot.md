@@ -145,8 +145,6 @@ void registerBeanDefinitions(AnnotationMetadata importingClassMetadata,
     //包含bean定义的注册表的接口
 ```
 
-## 
-
 ### @Enable*注解的详解
 
 **Enable 中文意思是启动。**
@@ -173,10 +171,6 @@ public class DelegatingWebMvcConfiguration extends WebMvcConfigurationSupport
 
 允许这些Bean自定义WebMvcConfigurationSupport提供的配置.
 
-
-
-
-
 - @EnableAspectJAutoProxy  激活Aspect自动代理
   - 对应的XML配置 `<aop:aspectj-autoproxy/>`
 - @EnableAsync         开启异步方法的支持。
@@ -186,8 +180,6 @@ public class DelegatingWebMvcConfiguration extends WebMvcConfigurationSupport
 - @EnableJpaRepositories   开启对Spring Data JPA Repostory的支持。
 - @EnableTransactionManagement  开启注解式事务的支持。
 - @EnableCaching   开启注解式的缓存支持
-
-
 
 ## 添加额外的配置类
 
