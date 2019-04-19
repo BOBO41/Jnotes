@@ -6,6 +6,12 @@
 
 ## :rocket: ​数据结构与算法
 
+- 符号表
+  - 二分查找树
+  - AVL树
+  - [红黑树](./数据结构与算法/数据结构/红黑树.md)
+  - [哈希表](./数据结构与算法/数据结构/哈希表.md)
+
 - [剑指 Offer 题解](https://github.com/CyC2018/CS-Notes/blob/master/docs/notes/剑指%20offer%20题解.md)  
 
 ## :computer: 操作系统
