@@ -33,6 +33,9 @@
     -  [Fork/Join框架](./Java/3.Java%20并发/2.juc/4.Fork-Join框架.md)
     -  [原子类](./Java/3.Java%20并发/2.juc/5.原子类.md)
     -  [并发容器](./Java/3.Java%20并发/2.juc/6.并发容器.md)
+-   [并发问题](./Java/3.Java%20并发/3.并发问题.md)
+-   [Java内存模型](./Java/3.Java%20并发/4.Java内存模型.md)
+-   [Java锁事](./Java/3.Java%20并发/5.Java锁事.pdf)
 
 
 ### 虚拟机
@@ -41,9 +44,9 @@
 - [类的生命周期](./Java/4.Java%20虚拟机/2.类的生命周期.md)
 - [对象的生命周期](./Java/4.Java%20虚拟机/3.对象的生命周期.md)
 
-### IO、NIO
+### IO
 
-
+### NIO
 
 ### 网络编程
 
@@ -52,7 +55,7 @@
 - Servlet
 - Spring
 - SpringMVC
-- [MyBatis](.Java/7.Java Web/4.持久层/MyBatis.md)
+- [MyBatis](.Java/7.Java%20Web/4.持久层/MyBatis.md)
 - Spring Security
 - Spring Boot
 - Spring Cloud
@@ -81,6 +84,6 @@
 
 ## :art:前端
 
--   JavaScript (迁移中........)
--   jQuery (迁移中........)
--   Bootstrap (迁移中........)
+-   JavaScript
+-   jQuery
+-   Bootstrap
