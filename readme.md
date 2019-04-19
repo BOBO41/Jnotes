@@ -24,16 +24,14 @@
 
 ### 并发
 
-- [多线程基础](./Java/3.Java并发/1.多线程基础.md)
-- [并发问题](./Java/3.Java并发/2.并发问题.md)
+- [多线程基础](./Java/3.Java 并发/1.多线程基础.md)
 - JUC
-  - [Java锁事](./Java/3.Java并发/3.Java锁事.pdf)
-  - [Condition](./Java/3.Java并发/4.Condition.md)
-  - [atomic](./Java/3.Java并发/5.atomic.md)
-  - [executor](./Java/3.Java并发/6.executor.md)
-  - [同步容器](./Java/3.Java并发/7.同步容器.md)
-  - [并发容器](./Java/3.Java并发/8.并发容器.md)
-  - [同步器](./Java/3.Java并发/9.同步器.md)
+  - [阻塞队列](./Java/3.Java 并发/2.juc/1.阻塞队列.md)
+  - [同步工具类](./Java/3.Java 并发/2.juc/2.同步工具类.md)
+  - [Executor框架](./Java/3.Java 并发/2.juc/3.Executor框架.md)
+  - [Fork/Join框架](./Java/3.Java 并发/2.juc/4.Fork-Join框架.md)
+  - [原子类](./Java/3.Java 并发/2.juc/5.原子类.md)
+  - [并发容器](./Java/3.Java 并发/2.juc/6.并发容器.md)
 
 ### 虚拟机
 

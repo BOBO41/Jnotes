@@ -1,0 +1,169 @@
+# 1.何谓Atomic？
+
+ Atomic一词跟原子有点关系，后者曾被人认为是最小物质的单位。计算机中的Atomic是指不能分割成若干部分的意思。如果一段代码被认为是Atomic，则表示这段代码在执行过程中，是不能被中断的。通常来说，原子指令由硬件提供，供软件来实现原子方法（某个线程进入该方法后，就不会被中断，直到其执行完成）
+
+ 在x86 平台上，CPU提供了在指令执行期间对总线加锁的手段。CPU芯片上有一条引线#HLOCK pin，如果汇编语言的程序中在一条指令前面加上前缀"LOCK"，经过汇编以后的机器代码就使CPU在执行这条指令的时候把#HLOCK pin的电位拉低，持续到这条指令结束时放开，从而把总线锁住，这样同一总线上别的CPU就暂时不能通过总线访问内存了，保证了这条指令在多处理器环境中的原子性。
+
+# 2.原子操作类
+
+当多个线程同时更新公共变量，会导致线程不安全，通常大家可以会想到使用synchronized关键字或者Lock来解决这个问题，synchronized和Lock可以保证多个线程不会同时更新该公共变量。为了使用更简单，性能更高效，jdk1.5提出原子操作类。
+
+原子操作类主要集中在Atomic（`java.util.concurrent.atomic`）包下，按照原子更新方式，这些原子操作类大致可以分为四种：原子更新基本类型、原子更新数组、原子更新引用以及原子更新属性，接下来就这四种类型原子操作类的具体实现做相关分析。
+
+## 2.1原子更新基本类型
+
+Atomic包主要提供三个类来更新基本类型变量：
+
+- AtomicBoolean：用来更新布尔型变量；
+- AtomicInteger：用来更新整型变量；
+- AtomicLong：用来更新长整型变量；
+
+
+
+## 2.2原子更新数组
+
+Atomic包提供三个类来以原子的方式更新数组里的元素：
+
+- AtomicIntegerArray：用来更新整型数组里的元素；
+- AtomicLongArray：用来更新长整型数组里的元素；
+- AtomicReferenceArray：用来更新引用类型数组里的元素。
+
+## 2.3原子更新引用类型
+
+原子更新基本类型每次只能更新一个变量，假如需要更新多个变量怎么办呢？针对这个问题，Atomic包提供引用类型类来一次更新多个变量：
+
+- AtomicReference：用于更新引用类型，可以理解为更新Object；
+- AtomicMarkableReference：用于更新带有标记位的引用类型；
+- AtomicStampedReference：用于更新带有版本号的引用类型，该类将版本号与引用类型关联起来，可以解决使用CAS进行原子更新时可能会出现的ABA问题。
+
+
+
+## 2.4原子更新属性
+
+AtomicReference系列可以更新Object，同样的，针对Object的属性，Atomic提供一下方法来更新Object的属性：
+
+- AtomicIntegerFieldUpdater：用于更新Object的整型属性；
+- AtomicLongFieldUpdater：用于更新Object的长整型属性；
+- AtomicReferenceFieldUpdater：用于更新Object的引用类型属性。
+
+# 3.原子操作类源码分析
+
+## 3.1原子更新基本类型
+
+对于原子跟新基本类型，我们以AtomicLong为切入点，分析一下具体的源码实现。
+
+AtomicLong有以下比较常用的方法： 
+
+- `boolean compareAndSet(long expect, long update)`
+- `long getAndSet(long newValue)`
+- add系列方法 
+    - `long addAndGet(long delta)`和`long getAndAdd(long delta)`
+- increment系列方法 
+- decrement系列方法 
+- `void lazySet(long newValue)`
+
+**compareAndSet**
+
+```java
+// 使用了CAS机制：CAS机制当中使用了3个基本操作数：内存地址V，旧的预期值A，要修改的新值B。
+// 调用Unsafe的compareAndSwapLong方法实现比较设置，如果当前value与预期值expect相等，则将value设置为update的值。
+public final boolean compareAndSet(long expect, long update) {
+    return unsafe.compareAndSwapLong(this, valueOffset, expect, update);
+}
+```
+
+```java
+// 当对象是数组的时候，offset才有用的，如果其他，offset其实是没用的
+public final native boolean compareAndSwapLong(Object o, long offset,
+                                               long expected,
+                                               long x);
+```
+
+**getAndSet**
+
+```java
+public final long getAndSet(long newValue) {
+    return unsafe.getAndSetLong(this, valueOffset, newValue);
+}
+```
+
+```java
+public final long getAndSetLong(Object o, long offset, long newValue) {
+    long v;
+    do {
+        v = getLongVolatile(o, offset);
+    } while (!compareAndSwapLong(o, offset, v, newValue));
+    return v;
+}
+```
+
+**add系列方法 **
+
+AtomicLong提供addAndGet方法和getAndAdd方法来做加法运算。 
+
+```java
+public final long getAndAdd(long delta) {
+    return unsafe.getAndAddLong(this, valueOffset, delta);
+}
+```
+
+```java
+public final long addAndGet(long delta) {
+    return unsafe.getAndAddLong(this, valueOffset, delta) + delta;
+}
+```
+
+**increment系列方法 **
+
+同add一样，AtomicLong同样提供两个方法：incrementAndGet和getAndIncrement方法来做自增操作。
+
+**decrement系列方法 **
+
+同样的，AtomicLong也提供两个方法：decrementAndGet和getAndDecrement方法来做自减操作。 
+
+**lazySet方法 **
+
+**练习**
+
+实现自增计数器，要求线程安全。
+
+## 3.2原子更新数组
+
+Atomic包提供三个类来以原子的方式更新数组里的元素：
+
+- AtomicIntegerArray：用来更新整型数组里的元素；
+- AtomicLongArray：用来更新长整型数组里的元素；
+- AtomicReferenceArray：用来更新引用类型数组里的元素。
+
+接下来还是以AtomicLongArray为例，分析具体的源码实现。
+
+AtomicLongArray同AtomicLong对外提供的方法大致一致，只不过前者是操作数组，后者是操作基本类型。
+
+```java
+//AtomicLongArray自己维护一个长整型数组array，对数组元素的操作实质是对array的操作。
+private final long[] array;
+```
+
+## 3.3原子更新引用类型
+
+原子更新基本类型每次只能更新一个变量，假如需要更新多个变量怎么办呢？针对这个问题，Atomic包提供引用类型类来一次更新多个变量：
+
+- AtomicReference：用于更新引用类型，可以理解为更新Object；
+- AtomicMarkableReference：用于更新带有标记位的引用类型；
+- AtomicStampedReference：用于更新带有版本号的引用类型，该类将版本号与引用类型关联起来，可以解决使用CAS进行原子更新时可能会出现的ABA问题。
+
+## 3.4原子更新属性
+
+AtomicReference系列可以更新Object，同样的，针对Object的属性，Atomic提供一下方法来更新Object的属性：
+
+- AtomicIntegerFieldUpdater：用于更新Object的整型属性；
+- AtomicLongFieldUpdater：用于更新Object的长整型属性；
+- AtomicReferenceFieldUpdater：用于更新Object的引用类型属性。
+
+以AtomicIntegerFieldUpdater为例，分析一下源码的具体实现。
+
+在使用AtomicIntegerFieldUpdater来更改Object整型属性大致分为两步：
+
+1. 使用静态方法newUpdater创建一个更新器，设置需要更新的类和属性；
+2. 调用相关CAS系列方法更新属性，**需要注意的是，更新的属性必须使用public volatile修饰**。
+
