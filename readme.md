@@ -6,12 +6,18 @@
 
 ## :rocket: ​数据结构与算法
 
+- 排序
+  - [选择排序](./数据结构与算法/算法/Sort/SelectionSort.java)
+  - [插入排序](./数据结构与算法/算法/Sort/InsertionSort.java.java)
+  - [希尔排序](./数据结构与算法/算法/Sort/ShellSort.java)
+  - [归并排序](./数据结构与算法/算法/Sort/MergeSort.java)
+  - [快排](./数据结构与算法/算法/Sort/QuickSort.java)
+  - [排序工具](./数据结构与算法/算法/Sort/SortUtils.java)
 - 符号表
   - 二分查找树
   - AVL树
   - [红黑树](./数据结构与算法/数据结构/红黑树.md)
   - [哈希表](./数据结构与算法/数据结构/哈希表.md)
-
 - [剑指 Offer 题解](https://github.com/CyC2018/CS-Notes/blob/master/docs/notes/剑指%20offer%20题解.md)  
 
 ## :computer: 操作系统
