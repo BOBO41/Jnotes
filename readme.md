@@ -32,8 +32,6 @@
 
 ### 基础
 
-### 容器
-
 
 ### 并发
 
@@ -67,7 +65,7 @@
 - Servlet
 - Spring
 - SpringMVC
-- [MyBatis](.Java/7.Java%20Web/4.持久层/MyBatis.md)
+- MyBatis
 - Spring Security
 - Spring Boot
 - Spring Cloud
