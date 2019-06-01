@@ -10,23 +10,17 @@ Spring Security不仅适用于基于HTTP和Servlet API构建Web应用,也适用�
 
    包含认证与访问控制的核心类与接口
 
-2. Remoting - spring-security-remoting.jar
+2. Config - spring-security-config.jar
 
-   与Spring Remoting进行整合
+   包含负责XML配置和Java配置的代码
 
 3. Web - spring-security-web.jar
 
    包含一些Servlet Filter以及与Web安全相关的代码
 
-4. Config - spring-security-config.jar
+4. Test - spring-security-test.jar
 
-   包含负责XML配置和Java配置的代码
-
-5. LDAP - spring-security-ldap.jar
-
-   包含负责LDAP认证和配置的代码
-
-6. OAuth2.0相关
+5. OAuth2.0相关
 
    1. OAuth 2.0 Core - spring-security-oauth2-core.jar
 
@@ -45,19 +39,25 @@ Spring Security不仅适用于基于HTTP和Servlet API构建Web应用,也适用�
       - JSON Web Encryption (JWE)
       - JSON Web Key (JWK)
 
-7. ACL - spring-security-acl.jar
+6. ACL - spring-security-acl.jar
 
    A Java access control list (ACL) is a data structure that grants or denies permission to access resources based on its object entries.
 
-8. CAS - spring-security-cas.jar
+7. CAS - spring-security-cas.jar
 
-9. OpenID - spring-security-openid.jar
+8. OpenID - spring-security-openid.jar
 
-10. Test - spring-security-test.jar
+9. Remoting - spring-security-remoting.jar
+
+   与Spring Remoting进行整合
+
+10. LDAP - spring-security-ldap.jar
+
+    包含负责LDAP认证和配置的代码
 
 ## 核心组件
 
-`Authentication`:描述当前用户的相关信息
+`Authentication`:代表一个认证
 
 `SecurityContext`:存储`Authentication`
 
@@ -69,13 +69,21 @@ Spring Security不仅适用于基于HTTP和Servlet API构建Web应用,也适用�
 
 `AuthenticationManager`:处理`Authentication`,默认实现`ProviderManager`通过调用`AuthenticationProvider`去处理`Authentication`
 
-## 用户名密码登录
+`AuthenticationManagerBuilder`：用于创建`AuthenticationManager`，方便构建in memory authentication, LDAP authentication, JDBC based authentication, adding UserDetailsService, and adding AuthenticationProvider's.
+
+
 
 `UserDetails` :存储用户信息,这些信息有一部分稍后会被封装进`Authentication`
 
 `UserDetailsService`:加载用户相关信息,充当于该框架中的UserDAO
 
+`UserDetailsManager`：`UserDetailsService`的子类，添加了创建新User和更新已存在的User的功能
 
+`User`：`UserDetails`的实现，方便我们使用。
+
+**表单登录大致过程**
+
+在Web容器启动前，我们已经往注册了一系列的的Filter。请求到达后，容器调用FilterChainProxy，FilterChainProxy遍历调用我们注册的Filter，在UsernamePasswordAuthenticationFilter，它识别出当前是一个表单登录的请求，然后调用自身的attemptAuthentication方法进行认证，attemptAuthentication方法调用AuthenticationManager进行认证，
 
 
 
